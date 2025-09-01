@@ -1,0 +1,75 @@
+# Flutter & Dart
+.dart_tool/
+.packages
+.flutter-plugins
+.flutter-plugins-dependencies
+.flutter-plugins-gen/
+.pub-cache/
+.pub/
+build/
+coverage/
+
+# Generated registrants
+**/generated_plugin_registrant.dart
+
+# IDEs & Editors
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# OS & Editor junk
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Android
+**/.gradle/
+android/.gradle/
+android/**/build/
+android/**/captures/
+android/**/outputs/
+android/local.properties
+**/*.keystore
+**/*.jks
+**/key.properties
+
+# iOS / Xcode
+ios/Pods/
+ios/.symlinks/
+ios/build/
+ios/Flutter/ephemeral/
+ios/Flutter/App.framework
+ios/Flutter/Flutter.framework
+ios/Flutter/Flutter.podspec
+ios/Flutter/Generated.xcconfig
+ios/Runner/GeneratedPluginRegistrant.*
+ios/Runner.xcodeproj/project.xcworkspace/
+ios/Runner.xcodeproj/xcuserdata/
+ios/Runner.xcworkspace/xcuserdata/
+**/DerivedData/
+**/*.pbxuser
+**/*.mode1v3
+**/*.mode2v3
+**/*.perspectivev3
+**/*.xcuserstate
+**/*.xcscmblueprint
+
+# Fastlane
+fastlane/report.xml
+fastlane/Preview.html
+fastlane/screenshots/
+fastlane/test_output/
+
+# Logs
+*.log
+
+# Optional: comment out if you intentionally commit Firebase configs
+# android/app/google-services.json
+# ios/Runner/GoogleService-Info.plist
+
+# Misc tool caches
+.cache/
+
