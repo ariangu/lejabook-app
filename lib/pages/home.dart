@@ -684,8 +684,8 @@ class _HomeState extends State<Home> {
         child: Column(
           children: <Widget>[
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                primary: (!checkedIn!)
+                              style: ElevatedButton.styleFrom(
+                foregroundColor: (!checkedIn!)
                     ? themeData.colorScheme.primary
                     : themeData.colorScheme.surface,
               ),
@@ -718,8 +718,8 @@ class _HomeState extends State<Home> {
                                 muted: true)),
                         actions: <Widget>[
                           TextButton(
-                            style: TextButton.styleFrom(
-                              primary: themeData.colorScheme.primary,
+                                                          style: TextButton.styleFrom(
+                              foregroundColor: themeData.colorScheme.primary,
                             ),
                             onPressed: () async {
                               Navigator.pop(context);

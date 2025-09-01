@@ -26,7 +26,7 @@ dependencies:
   path_provider: ^2.1.4
   permission_handler: ^12.0.1
   shared_preferences: ^2.3.2
-  geolocator: ^14.0.2
+  geolocator: ^12.0.0
   get_ip_address: ^0.0.7
 
   # --- date / time ---

@@ -207,7 +207,7 @@ class _LoginState extends State<Login> {
                               shape: RoundedRectangleBorder(
                                   borderRadius:
                                       BorderRadius.circular(MySize.size24!)),
-                              primary: themeData.colorScheme.primary,
+                              foregroundColor: themeData.colorScheme.primary,
                             ),
                             child: Text(
                                 isLoading

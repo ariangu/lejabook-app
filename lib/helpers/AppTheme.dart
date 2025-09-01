@@ -233,7 +233,6 @@ class AppTheme {
         focusColor: Color(0xff35a968),
         hoverColor: Color(0xff0bad63)),
     dividerColor: Color(0xffd1d1d1),
-    errorColor: Color(0xfff0323c),
     cardColor: Colors.white,
     popupMenuTheme: PopupMenuThemeData(
       color: Color(0xffffffff),
@@ -316,7 +315,6 @@ class AppTheme {
             borderSide: BorderSide(width: 1, color: Colors.white70)),
       ),
       dividerColor: Color(0xffd1d1d1),
-      errorColor: Colors.orange,
       cardColor: Color(0xff282a2b),
       splashColor: Colors.white.withAlpha(100),
       floatingActionButtonTheme: FloatingActionButtonThemeData(

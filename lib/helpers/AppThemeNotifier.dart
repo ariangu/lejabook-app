@@ -12,7 +12,7 @@ class AppThemeNotifier extends ChangeNotifier {
   init() async {
     SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
     int? data = sharedPreferences.getInt("themeMode");
-    _themeMode = data;
+    _themeMode = data ?? 1;
     notifyListeners();
   }
 

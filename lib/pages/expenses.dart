@@ -234,8 +234,8 @@ class _ExpenseState extends State<Expense> {
                 padding: EdgeInsets.all(MySize.size8!),
               ),
               ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  primary: themeData.colorScheme.primary,
+                                  style: ElevatedButton.styleFrom(
+                  foregroundColor: themeData.colorScheme.primary,
                 ),
                 onPressed: () async {
                   if (await Helper().checkConnectivity()) {

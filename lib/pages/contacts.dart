@@ -713,7 +713,7 @@ class _ContactsState extends State<Contacts> {
     return Scaffold(
       appBar: new AppBar(
         title: Text(AppLocalizations.of(context).translate('create_contact'),
-            style: themeData.appBarTheme.titleTextStyle!.titleLarge),
+            style: themeData.textTheme.titleLarge),
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,

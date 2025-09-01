@@ -789,7 +789,7 @@ class _FollowUpFormState extends State<FollowUpForm> {
             (widget.edit == true)
                 ? "${AppLocalizations.of(context).translate('edit_follow_up')}"
                 : "${AppLocalizations.of(context).translate('add_follow_up')}",
-            style: themeData.appBarTheme.titleTextStyle!.titleLarge),
+            style: themeData.textTheme.titleLarge),
       ),
       body: Container(
         height: MySize.screenHeight,

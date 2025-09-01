@@ -1099,7 +1099,7 @@ class _SalesState extends State<Sales> {
                             ),
                             onPressed: () async {
                               // call
-                              await launchUrl(Uri.parse('tel:${sellList[index]['mobile']}')));
+                              await launchUrl(Uri.parse('tel:${sellList[index]['mobile']}'));
                             })
                         : Container()
                   ],

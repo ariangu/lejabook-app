@@ -1,6 +1,6 @@
 import 'dart:convert';
 
-import 'package:badges/badges.dart';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -314,29 +314,21 @@ class _ProductsState extends State<Products> {
           leading: null,
           actions: <Widget>[
             locations(),
-            Badge(
-              badgeColor: themeData.colorScheme.error,
-              shape: BadgeShape.circle,
-              borderRadius: BorderRadius.circular(MySize.size20!),
-              toAnimate: true,
-              position: BadgePosition.topStart(start: 5.0, top: 5.0),
-              badgeContent: FutureBuilder(
-                  future: (argument != null && argument!['sellId'] != null)
-                      ? getCartItemCount(sellId: argument!['sellId'])
-                      : getCartItemCount(isCompleted: 0),
-                  builder: (context, AsyncSnapshot<String> snapshot) {
-                    if (snapshot.hasData) {
-                      return Center(
-                        child: Text('${snapshot.data}',
-                            style: TextStyle(color: Colors.white)),
-                      );
-                    } else
-                      return Center(
-                        child: Text("0", style: TextStyle(color: Colors.white)),
-                      );
-                  }),
-              child: IconButton(
-                  icon: Icon(Icons.shopping_cart),
+            FutureBuilder(
+                future: (argument != null && argument!['sellId'] != null)
+                    ? getCartItemCount(sellId: argument!['sellId'])
+                    : getCartItemCount(isCompleted: 0),
+                builder: (context, AsyncSnapshot<String> snapshot) {
+                  int count = 0;
+                  if (snapshot.hasData) {
+                    count = int.tryParse(snapshot.data!) ?? 0;
+                  }
+                  
+                  return Badge(
+                    label: Text('$count'),
+                    backgroundColor: themeData.colorScheme.error,
+                    child: IconButton(
+                        icon: Icon(Icons.shopping_cart),
                   onPressed: () {
                     if (argument != null) {
                       Navigator.pushReplacementNamed(context, '/cart',
@@ -357,7 +349,8 @@ class _ProductsState extends State<Products> {
                       }
                     }
                   }),
-            )
+                  );
+                }),
           ],
         ),
         body: (canViewProducts)

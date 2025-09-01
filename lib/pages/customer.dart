@@ -132,8 +132,8 @@ class _CustomerState extends State<Customer> {
                 visible: argument!['is_quotation'] == null,
                 child: TextButton(
                   onPressed: (addQuotation),
-                  style: TextButton.styleFrom(
-                      primary: Colors.black,
+                                        style: TextButton.styleFrom(
+                      foregroundColor: Colors.black,
                       backgroundColor: style.StyleColors().mainColor(1),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(40.0),
@@ -208,8 +208,8 @@ class _CustomerState extends State<Customer> {
                   color: themeData.colorScheme.onSurface, fontWeight: 700)),
           actions: [
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                primary: themeData.colorScheme.primary,
+                              style: ElevatedButton.styleFrom(
+                foregroundColor: themeData.colorScheme.primary,
               ),
               onPressed: () async {
                 if (argument!['sellId'] != null) {
@@ -229,8 +229,8 @@ class _CustomerState extends State<Customer> {
               child: Text(AppLocalizations.of(context).translate('save')),
             ),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                primary: themeData.colorScheme.primary,
+                              style: ElevatedButton.styleFrom(
+                foregroundColor: themeData.colorScheme.primary,
               ),
               onPressed: () async {
                 await SellDatabase().storeSell(sell).then((value) async {
@@ -264,7 +264,7 @@ class _CustomerState extends State<Customer> {
     return Scaffold(
       appBar: new AppBar(
         title: Text(AppLocalizations.of(context).translate('create_contact'),
-            style: themeData.appBarTheme.titleTextStyle!.titleLarge),
+            style: themeData.textTheme.titleLarge),
       ),
       body: Container(
         height: MediaQuery.of(context).size.height,

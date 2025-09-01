@@ -172,8 +172,8 @@ class _ContactPaymentState extends State<ContactPayment> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        primary: themeData.colorScheme.primary,
+                                              style: ElevatedButton.styleFrom(
+                        foregroundColor: themeData.colorScheme.primary,
                       ),
                       onPressed: () async {
                         await onSubmit();

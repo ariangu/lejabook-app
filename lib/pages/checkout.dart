@@ -654,7 +654,7 @@ class CheckOutState extends State<CheckOut> {
                               flex: 1,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                    primary: themeData.colorScheme.onPrimary,
+                                    foregroundColor: themeData.colorScheme.onPrimary,
                                     elevation: 5),
                                 onPressed: () {
                                   _printInvoice = false;
@@ -685,7 +685,7 @@ class CheckOutState extends State<CheckOut> {
                               flex: 1,
                               child: ElevatedButton(
                                 style: ElevatedButton.styleFrom(
-                                    primary: themeData.colorScheme.primary,
+                                    foregroundColor: themeData.colorScheme.primary,
                                     elevation: 5),
                                 onPressed: () {
                                   _printInvoice = true;
@@ -969,8 +969,8 @@ class CheckOutState extends State<CheckOut> {
               muted: true)),
       actions: <Widget>[
         TextButton(
-            style: TextButton.styleFrom(
-                primary: themeData.colorScheme.onPrimary,
+                            style: TextButton.styleFrom(
+                foregroundColor: themeData.colorScheme.onPrimary,
                 backgroundColor: themeData.colorScheme.primary),
             onPressed: () {
               Navigator.pop(context);
@@ -980,8 +980,8 @@ class CheckOutState extends State<CheckOut> {
             },
             child: Text(AppLocalizations.of(context).translate('ok'))),
         TextButton(
-            style: TextButton.styleFrom(
-                primary: themeData.colorScheme.primary,
+                            style: TextButton.styleFrom(
+                foregroundColor: themeData.colorScheme.primary,
                 backgroundColor: themeData.colorScheme.onPrimary),
             onPressed: () {
               Navigator.pop(context);
@@ -1014,8 +1014,8 @@ class CheckOutState extends State<CheckOut> {
               muted: true)),
       actions: <Widget>[
         TextButton(
-            style: TextButton.styleFrom(
-                primary: themeData.colorScheme.primary,
+                            style: TextButton.styleFrom(
+                foregroundColor: themeData.colorScheme.primary,
                 backgroundColor: themeData.colorScheme.onPrimary),
             onPressed: () {
               Navigator.pop(context);
@@ -1024,7 +1024,7 @@ class CheckOutState extends State<CheckOut> {
         TextButton(
             style: TextButton.styleFrom(
                 backgroundColor: Colors.red,
-                primary: themeData.colorScheme.onError),
+                foregroundColor: themeData.colorScheme.onError),
             onPressed: () {
               Navigator.pop(context);
               if (sellId != null && payments[index]['id'] != null) {
