@@ -4,7 +4,7 @@ import 'package:barcode_scan2/barcode_scan2.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 
 // import 'package:call_log/call_log.dart';
-import 'package:connectivity/connectivity.dart';
+import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:cron/cron.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_html_to_pdf/flutter_html_to_pdf.dart';
@@ -12,7 +12,7 @@ import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
-import 'package:pdf/widgets.dart' as pw;
+
 import 'package:permission_handler/permission_handler.dart';
 import 'package:printing/printing.dart';
 import 'package:share/share.dart';
@@ -99,8 +99,8 @@ class Helper {
   //check internet connectivity
   Future<bool> checkConnectivity() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult == ConnectivityResult.mobile ||
-        connectivityResult == ConnectivityResult.wifi) {
+    if (connectivityResult.contains(ConnectivityResult.mobile) ||
+        connectivityResult.contains(ConnectivityResult.wifi)) {
       return true;
     } else {
       return false;
@@ -177,16 +177,18 @@ class Helper {
     String _invoice = (invoice != null)
         ? invoice
         : await InvoiceFormatter().generateInvoice(sellId, taxId, context);
-    Printing.layoutPdf(onLayout: (pageFormat) async {
-      final doc = pw.Document();
-      await Printing.layoutPdf(
-          onLayout: (PdfPageFormat format) async => await Printing.convertHtml(
-                format: format,
-                html: _invoice,
-              ));
-
-      return doc.save();
-    });
+    
+    // Use the modern approach for PDF generation
+    await Printing.layoutPdf(
+        onLayout: (PdfPageFormat format) async {
+          // Note: convertHtml is deprecated but still functional
+          // TODO: Migrate to newer PDF generation method when available
+          // ignore: deprecated_member_use
+          return await Printing.convertHtml(
+            format: format,
+            html: _invoice,
+          );
+        });
   }
 
   // //request permissions
