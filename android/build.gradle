@@ -1,0 +1,64 @@
+buildscript {
+    ext.kotlin_version = '1.8.22'
+    repositories {
+        google()
+        mavenCentral()   // jcenter is deprecated
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.1.4'
+        classpath 'com.google.gms:google-services:4.3.15'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        mavenCentral()   // jcenter is deprecated
+    }
+}
+
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+/* ------------------------------------------------------------------
+   AGP 8 helpers
+   ------------------------------------------------------------------ */
+
+// 1. Force all Kotlin-Gradle-plugin references to 1.8.22
+subprojects { sub ->
+    plugins.withId('org.jetbrains.kotlin.android') {
+        sub.dependencies.add(
+                'implementation',
+                "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+        )
+    }
+    plugins.withId('kotlin-android') {
+        sub.dependencies.add(
+                'implementation',
+                "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+        )
+    }
+}
+
+// 2. Inject namespace for any Android library that still lacks it
+subprojects { sub ->
+    plugins.withId('com.android.library') {
+        if (!android.hasProperty('namespace') || android.namespace == null) {
+            android.namespace = "com.example.${sub.name.replaceAll('[^a-zA-Z0-9]', '_')}"
+        }
+    }
+    plugins.withId('com.android.application') {
+        // Skip :app – it already declares its own namespace
+    }
+}
+
+tasks.register("clean", Delete) {
+    delete rootProject.buildDir
+}

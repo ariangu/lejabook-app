@@ -1,0 +1,78 @@
+name: pos_2
+description: A new Flutter application.
+publish_to: 'none'
+version: 1.1.0+2
+
+environment:
+  sdk: ">=2.12.0 <4.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+
+  # --- core / ui ---
+  cupertino_icons: ^1.0.8
+  badges: ^3.1.2
+  cached_network_image: ^3.4.0
+  google_fonts: ^6.2.1
+  material_design_icons_flutter: ^7.0.7296
+
+  # --- device & platform ---
+  app_settings: ^6.1.1
+  connectivity_plus: ^6.0.3
+  image_picker: ^1.1.2
+  path_provider: ^2.1.4
+  permission_handler: ^12.0.1
+  shared_preferences: ^2.3.2
+  geolocator: ^14.0.2
+  get_ip_address: ^0.0.7
+
+  # --- date / time ---
+  flutter_datetime_picker_plus: ^2.2.0   # replaces date_time_picker
+  syncfusion_flutter_datepicker: ^26.2.14
+  date_time_picker: ^2.1.0
+
+  # --- networking & dio ---
+  dio: ^5.7.0
+  http: ^1.2.2
+
+  # --- pdf / printing ---
+  pdf: ^3.11.1
+  printing: ^5.13.1
+  html_to_pdf: ^0.8.1          # upgraded
+  flutter_html_to_pdf: ^0.7.0
+  share: ^2.0.4
+
+  # --- barcode / qr ---
+  barcode_scan2: ^4.3.3
+  qr_flutter: ^4.1.0
+
+  # --- misc ---
+  cron: ^0.6.0
+  fluttertoast: ^8.2.4
+  provider: ^6.1.2
+  sqflite: ^2.3.2
+  url_launcher: ^6.3.0
+  video_player: ^2.9.1
+  search_choices: ^2.2.9
+  google_maps_flutter: ^2.9.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_launcher_icons: ^0.14.0
+
+dependency_overrides:
+  intl: ^0.19.0   # keep Flutter SDK happy
+
+flutter_icons:
+  android: "launcher_icon"
+  image_path: "assets/icon/TM Tech POS.png"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/images/
+    - i18n/
