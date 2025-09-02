@@ -1450,7 +1450,7 @@ class _SalesState extends State<Sales> {
   Widget customers() {
     return DropdownSearch<Map<dynamic, dynamic>>(
       selectedItem: selectedCustomer,
-      items: customerListMap,
+      items: (String filter, LoadProps? loadProps) => customerListMap,
       itemAsString: (Map<dynamic, dynamic> value) => "${value['name']} (${value['mobile'] ?? ' - '})",
       onChanged: (Map<dynamic, dynamic>? newValue) async {
         if (newValue != null) {
@@ -1459,24 +1459,33 @@ class _SalesState extends State<Sales> {
           });
         }
       },
-      dropdownButton: Icon(Icons.arrow_drop_down, color: Colors.blue),
-      dropdownSearchDecoration: InputDecoration(
-        border: UnderlineInputBorder(),
-        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      suffixProps: DropdownSuffixProps(
+        dropdownButtonProps: DropdownButtonProps(
+          iconClosed: Icon(Icons.arrow_drop_down, color: Colors.blue),
+          iconOpened: Icon(Icons.arrow_drop_up, color: Colors.blue),
+        ),
       ),
-      popupItemBuilder: (context, item, isSelected) {
-        return Container(
-          width: MySize.screenWidth! * 0.8,
-          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Text(
-            "${item['name']} (${item['mobile'] ?? ' - '})",
-            softWrap: true,
-            overflow: TextOverflow.ellipsis,
-            style: AppTheme.getTextStyle(themeData.textTheme.bodyMedium,
-                color: themeData.colorScheme.onSurface),
-          ),
-        );
-      },
+      decoratorProps: DropDownDecoratorProps(
+        decoration: InputDecoration(
+          border: UnderlineInputBorder(),
+          contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        ),
+      ),
+      popupProps: PopupProps.menu(
+        itemBuilder: (context, item, isDisabled, isSelected) {
+          return Container(
+            width: MySize.screenWidth! * 0.8,
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(
+              "${item['name']} (${item['mobile'] ?? ' - '})",
+              softWrap: true,
+              overflow: TextOverflow.ellipsis,
+              style: AppTheme.getTextStyle(themeData.textTheme.bodyMedium,
+                  color: themeData.colorScheme.onSurface),
+            ),
+          );
+        },
+      ),
     );
   }
 
