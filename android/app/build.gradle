@@ -6,21 +6,22 @@ plugins {
 }
 
 android {
-    namespace = "com.example.lejabookapp"
+    namespace = "com.bitlife.lejabook.bookleja"
     compileSdk = 35
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
 
     kotlinOptions {
-        jvmTarget = '11'
+        jvmTarget = JavaVersion.VERSION_1_8
     }
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.example.lejabookapp"
+        applicationId = "com.bitlife.lejabook.bookleja"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
@@ -36,50 +37,8 @@ android {
             signingConfig = signingConfigs.debug
         }
     }
-
-    // Advanced manifest merging configuration
-    sourceSets {
-        main {
-            manifest.srcFile 'src/main/AndroidManifest.xml'
-        }
-    }
-
-    // Handle manifest merge conflicts
-    packagingOptions {
-        exclude 'META-INF/DEPENDENCIES'
-        exclude 'META-INF/LICENSE'
-        exclude 'META-INF/LICENSE.txt'
-        exclude 'META-INF/license.txt'
-        exclude 'META-INF/NOTICE'
-        exclude 'META-INF/NOTICE.txt'
-        exclude 'META-INF/notice.txt'
-        exclude 'META-INF/ASL2.0'
-        exclude 'META-INF/*.kotlin_module'
-    }
-
-    // Handle Java compilation issues
-    lintOptions {
-        checkReleaseBuilds false
-        abortOnError false
-    }
-
-    // Handle jlink compilation issues
-    packagingOptions {
-        jniLibs {
-            useLegacyPackaging = true
-        }
-    }
-
-    // Additional configurations to handle compilation issues
-    aaptOptions {
-        cruncherEnabled = false
-    }
 }
 
 flutter {
     source = "../.."
-}
-
-dependencies {
-    implementation 'androidx.multidex:multidex:2.0.1'
 }

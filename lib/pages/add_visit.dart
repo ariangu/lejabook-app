@@ -1,10 +1,9 @@
 import 'dart:convert';
 
-import 'package:date_time_picker/date_time_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
-import 'package:search_choices/search_choices.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 
 import '../apis/field_force.dart';
 import '../config.dart';
@@ -374,35 +373,36 @@ class _NewVisitFormState extends State<NewVisitForm> {
 
   //dropdown widget for selecting customer
   Widget customerList() {
-    return SearchChoices.single(
-      underline: Visibility(
-        child: Container(),
-        visible: false,
-      ),
-      displayClearIcon: false,
-      value: jsonEncode(selectedCustomer),
-      items: customerListMap.map<DropdownMenuItem<String>>((Map value) {
-        return DropdownMenuItem<String>(
-            value: jsonEncode(value),
-            child: Container(
-              width: MySize.screenWidth! * 0.8,
-              child: Text("${value['name']} (${value['mobile'] ?? ' - '})",
-                  softWrap: true,
-                  maxLines: 5,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTheme.getTextStyle(themeData.textTheme.bodyMedium,
-                      color: themeData.colorScheme.onSurface)),
-            ));
-      }).toList(),
-      // value: customerListMap[0],
-      iconEnabledColor: Colors.blue,
-      iconDisabledColor: Colors.black,
-      onChanged: (value) async {
-        setState(() {
-          selectedCustomer = jsonDecode(value);
-        });
+    return DropdownSearch<Map<String, dynamic>>(
+      selectedItem: selectedCustomer,
+      items: customerListMap,
+      itemAsString: (Map<String, dynamic> value) => "${value['name']} (${value['mobile'] ?? ' - '})",
+      onChanged: (Map<String, dynamic>? newValue) async {
+        if (newValue != null) {
+          setState(() {
+            selectedCustomer = newValue;
+          });
+        }
       },
-      isExpanded: true,
+      dropdownButton: Icon(Icons.arrow_drop_down, color: Colors.blue),
+      dropdownSearchDecoration: InputDecoration(
+        border: UnderlineInputBorder(),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      ),
+      popupItemBuilder: (context, item, isSelected) {
+        return Container(
+          width: MySize.screenWidth! * 0.8,
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Text(
+            "${item['name']} (${item['mobile'] ?? ' - '})",
+            softWrap: true,
+            maxLines: 5,
+            overflow: TextOverflow.ellipsis,
+            style: AppTheme.getTextStyle(themeData.textTheme.bodyMedium,
+                color: themeData.colorScheme.onSurface),
+          ),
+        );
+      },
     );
   }
 

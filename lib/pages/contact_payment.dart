@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:search_choices/search_choices.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 
 import '../apis/contact_payment.dart';
 import '../helpers/AppTheme.dart';
@@ -239,74 +239,75 @@ class _ContactPaymentState extends State<ContactPayment> {
           style: AppTheme.getTextStyle(themeData.textTheme.titleSmall,
               fontWeight: 700, letterSpacing: -0.2),
         ),
-        SearchChoices.single(
-          underline: Visibility(
-            child: Container(),
-            visible: false,
-          ),
-          displayClearIcon: false,
-          value: jsonEncode(selectedCustomer),
-          items: customerListMap.map<DropdownMenuItem<String>>((Map value) {
-            return DropdownMenuItem<String>(
-                value: jsonEncode(value),
-                child: Container(
-                  width: MySize.screenWidth! * 0.8,
-                  child: Text("${value['name']} (${value['mobile'] ?? ' - '})",
-                      softWrap: true,
-                      maxLines: 5,
-                      overflow: TextOverflow.ellipsis,
-                      style: AppTheme.getTextStyle(
-                          themeData.textTheme.bodyMedium,
-                          color: themeData.colorScheme.onSurface)),
-                ));
-          }).toList(),
-          // value: customerListMap[0],
-          iconEnabledColor: Colors.blue,
-          iconDisabledColor: Colors.black,
-          onChanged: (value) async {
-            setState(() {
-              selectedCustomer = jsonDecode(value);
-            });
-            var newValue = selectedCustomer['id'];
-            if (newValue != 0) {
-              if (await Helper().checkConnectivity()) {
-                showDialog(
-                  barrierDismissible: false,
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      content: Row(
-                        children: [
-                          CircularProgressIndicator(),
-                          Container(
-                              margin: EdgeInsets.only(left: 5),
-                              child: Text(AppLocalizations.of(context)
-                                  .translate('loading'))),
-                        ],
-                      ),
-                    );
-                  },
-                );
-                await ContactPaymentApi()
-                    .getCustomerDue(newValue)
-                    .then((value) {
-                  if (value != null) {
-                    due = value['data'][0]['sell_due'].toString();
-                    setState(() {
-                      selectedCustomerId = newValue;
-                      _formKey.currentState!.reset();
-                    });
-                  }
-                  Navigator.pop(context);
-                });
-              } else {
-                Fluttertoast.showToast(
-                    msg: AppLocalizations.of(context)
-                        .translate('check_connectivity'));
+        DropdownSearch<Map<String, dynamic>>(
+          selectedItem: selectedCustomer,
+          items: customerListMap,
+          itemAsString: (Map<String, dynamic> value) => "${value['name']} (${value['mobile'] ?? ' - '})",
+          onChanged: (Map<String, dynamic>? newValue) async {
+            if (newValue != null) {
+              setState(() {
+                selectedCustomer = newValue;
+              });
+              var newValueId = selectedCustomer['id'];
+              if (newValueId != 0) {
+                if (await Helper().checkConnectivity()) {
+                  showDialog(
+                    barrierDismissible: false,
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        content: Row(
+                          children: [
+                            CircularProgressIndicator(),
+                            Container(
+                                margin: EdgeInsets.only(left: 5),
+                                child: Text(AppLocalizations.of(context)
+                                    .translate('loading'))),
+                          ],
+                        ),
+                      );
+                    },
+                  );
+                  await ContactPaymentApi()
+                      .getCustomerDue(newValueId)
+                      .then((value) {
+                    if (value != null) {
+                      due = value['data'][0]['sell_due'].toString();
+                      setState(() {
+                        selectedCustomerId = newValueId;
+                        _formKey.currentState!.reset();
+                      });
+                    }
+                    Navigator.pop(context);
+                  });
+                } else {
+                  Fluttertoast.showToast(
+                      msg: AppLocalizations.of(context)
+                          .translate('check_connectivity'));
+                }
               }
             }
           },
-          isExpanded: true,
+          dropdownButton: Icon(Icons.arrow_drop_down, color: Colors.blue),
+          dropdownSearchDecoration: InputDecoration(
+            border: UnderlineInputBorder(),
+            contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          ),
+          popupItemBuilder: (context, item, isSelected) {
+            return Container(
+              width: MySize.screenWidth! * 0.8,
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                "${item['name']} (${item['mobile'] ?? ' - '})",
+                softWrap: true,
+                maxLines: 5,
+                overflow: TextOverflow.ellipsis,
+                style: AppTheme.getTextStyle(
+                    themeData.textTheme.bodyMedium,
+                    color: themeData.colorScheme.onSurface),
+              ),
+            );
+          },
         )
       ],
     );

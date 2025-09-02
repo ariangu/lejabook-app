@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'package:date_time_picker/date_time_picker.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -178,26 +178,74 @@ class CheckOutState extends State<CheckOut> {
           Card(
             margin: EdgeInsets.all(MySize.size5!),
             shadowColor: Colors.blue,
-            child: DateTimePicker(
-              use24HourFormat: true,
-              locale: Locale('en', 'US'),
-              initialValue: transactionDate,
-              type: DateTimePickerType.dateTime,
-              firstDate: DateTime.now().subtract(Duration(days: 366)),
-              lastDate: DateTime.now(),
-              dateLabelText:
-                  "${AppLocalizations.of(context).translate('date')}:",
-              style: AppTheme.getTextStyle(
-                themeData.textTheme.bodyLarge,
-                fontWeight: 700,
-                color: themeData.colorScheme.primary,
+            child: Padding(
+              padding: EdgeInsets.all(MySize.size8!),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "${AppLocalizations.of(context).translate('date')}:",
+                    style: AppTheme.getTextStyle(
+                      themeData.textTheme.bodyLarge,
+                      fontWeight: 700,
+                      color: themeData.colorScheme.primary,
+                    ),
+                  ),
+                  SizedBox(height: MySize.size8!),
+                  InkWell(
+                    onTap: () async {
+                      final DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.parse(transactionDate),
+                        firstDate: DateTime.now().subtract(Duration(days: 366)),
+                        lastDate: DateTime.now(),
+                      );
+                      if (pickedDate != null) {
+                        final TimeOfDay? pickedTime = await showTimePicker(
+                          context: context,
+                          initialTime: TimeOfDay.fromDateTime(DateTime.parse(transactionDate)),
+                        );
+                        if (pickedTime != null) {
+                          final DateTime combinedDateTime = DateTime(
+                            pickedDate.year,
+                            pickedDate.month,
+                            pickedDate.day,
+                            pickedTime.hour,
+                            pickedTime.minute,
+                          );
+                          setState(() {
+                            transactionDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(combinedDateTime);
+                          });
+                        }
+                      }
+                    },
+                    child: Container(
+                      padding: EdgeInsets.all(MySize.size8!),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: themeData.colorScheme.outline),
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            transactionDate,
+                            style: AppTheme.getTextStyle(
+                              themeData.textTheme.bodyLarge,
+                              fontWeight: 600,
+                              color: themeData.colorScheme.onSurface,
+                            ),
+                          ),
+                          Icon(
+                            Icons.calendar_today,
+                            color: themeData.colorScheme.primary,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              textAlign: TextAlign.center,
-              onChanged: (val) {
-                setState(() {
-                  transactionDate = val;
-                });
-              },
             ),
           ),
           ListView.builder(

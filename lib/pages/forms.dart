@@ -3,14 +3,14 @@
 import 'dart:convert';
 import 'dart:io';
 
-import 'package:date_time_picker/date_time_picker.dart';
+import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -32,8 +32,9 @@ class VisitForm extends StatefulWidget {
 
 class _VisitFormState extends State<VisitForm> {
   String visitStatus = '', location = '';
-  PlatformFile? _image;
+  XFile? _image;
   bool isLoading = false, showMeet2 = false, showMeet3 = false;
+  final ImagePicker _picker = ImagePicker();
   final _formKey = GlobalKey<FormState>();
   LatLng? currentLoc;
 
@@ -624,17 +625,10 @@ class _VisitFormState extends State<VisitForm> {
                                   msg: AppLocalizations.of(context).translate(
                                       'please_upload_image_of_visited_place'));
                             } else {
-                              if (_image!.path != null) {
-                                File imageFile = new File(_image!.path!);
-                                List<int> imageBytes =
-                                    imageFile.readAsBytesSync();
-                                placeImage = base64Encode(imageBytes);
-                              } else {
-                                validated = false;
-                                Fluttertoast.showToast(
-                                    msg: AppLocalizations.of(context).translate(
-                                        'invalid_image_file'));
-                              }
+                              File imageFile = new File(_image!.path);
+                              List<int> imageBytes =
+                                  imageFile.readAsBytesSync();
+                              placeImage = base64Encode(imageBytes);
                             }
 
                             if (currentLoc == null) {
@@ -700,10 +694,10 @@ class _VisitFormState extends State<VisitForm> {
 
   //image from camera
   _imgFromCamera() async {
-    FilePickerResult? result = await FilePicker.platform.pickFiles(
-        type: FileType.image); //, imageQuality: 50);
+    XFile? image = await _picker.pickImage(
+        source: ImageSource.camera); //, imageQuality: 50);
     setState(() {
-      _image = result?.files.first;
+      _image = image;
     });
   }
 }
@@ -1046,60 +1040,66 @@ class _FollowUpFormState extends State<FollowUpForm> {
                     ),
                     Padding(
                       padding: EdgeInsets.only(top: MySize.size16!),
-                      child: DateTimePicker(
-                        controller: startDateController,
-                        type: DateTimePickerType.dateTime,
-                        firstDate: DateTime.now().subtract(Duration(days: 366)),
-                        lastDate: DateTime.now().add(Duration(days: 180)),
-                        dateMask: 'yyyy-MM-dd    hh:mm a',
-                        dateLabelText:
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
                             "${AppLocalizations.of(context).translate('start_datetime')}:",
-                        style: AppTheme.getTextStyle(
-                          themeData.textTheme.bodyLarge,
-                          fontWeight: 500,
-                          color: themeData.colorScheme.onSurface,
-                        ),
-                        onChanged: (val) {
-                          setState(() {
-                            startDateController.text = val;
-                          });
-                        },
-                        validator: (value) {
-                          if (value == '')
-                            return "${AppLocalizations.of(context).translate('start_datetime')} "
-                                "${AppLocalizations.of(context).translate('required')}";
-                          else
-                            return null;
-                        },
+                            style: AppTheme.getTextStyle(
+                              themeData.textTheme.bodyLarge,
+                              fontWeight: 500,
+                              color: themeData.colorScheme.onSurface,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          SfDateRangePicker(
+                            onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
+                              if (args.value is DateTime) {
+                                setState(() {
+                                  startDateController.text = DateFormat('yyyy-MM-dd HH:mm:ss').format(args.value);
+                                });
+                              }
+                            },
+                            selectionMode: DateRangePickerSelectionMode.single,
+                            allowViewNavigation: true,
+                            initialSelectedDate: DateTime.now(),
+                            initialDisplayDate: DateTime.now(),
+                            minDate: DateTime.now().subtract(Duration(days: 366)),
+                            maxDate: DateTime.now().add(Duration(days: 180)),
+                          ),
+                        ],
                       ),
                     ),
                     Padding(
                       padding: EdgeInsets.only(top: MySize.size16!),
-                      child: DateTimePicker(
-                        controller: endDateController,
-                        type: DateTimePickerType.dateTime,
-                        firstDate: DateTime.now().subtract(Duration(days: 366)),
-                        lastDate: DateTime.now().add(Duration(days: 180)),
-                        dateMask: 'yyyy-MM-dd    hh:mm a',
-                        dateLabelText:
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
                             "${AppLocalizations.of(context).translate('end_datetime')}:",
-                        style: AppTheme.getTextStyle(
-                          themeData.textTheme.bodyLarge,
-                          fontWeight: 500,
-                          color: themeData.colorScheme.onSurface,
-                        ),
-                        onChanged: (val) {
-                          setState(() {
-                            endDateController.text = val;
-                          });
-                        },
-                        validator: (value) {
-                          if (value == '')
-                            return "${AppLocalizations.of(context).translate('end_datetime')} "
-                                "${AppLocalizations.of(context).translate('required')}";
-                          else
-                            return null;
-                        },
+                            style: AppTheme.getTextStyle(
+                              themeData.textTheme.bodyLarge,
+                              fontWeight: 500,
+                              color: themeData.colorScheme.onSurface,
+                            ),
+                          ),
+                          SizedBox(height: 8),
+                          SfDateRangePicker(
+                            onSelectionChanged: (DateRangePickerSelectionChangedArgs args) {
+                              if (args.value is DateTime) {
+                                setState(() {
+                                  endDateController.text = DateFormat('yyyy-MM-dd HH:mm:ss').format(args.value);
+                                });
+                              }
+                            },
+                            selectionMode: DateRangePickerSelectionMode.single,
+                            allowViewNavigation: true,
+                            initialSelectedDate: DateTime.now(),
+                            initialDisplayDate: DateTime.now(),
+                            minDate: DateTime.now().subtract(Duration(days: 366)),
+                            maxDate: DateTime.now().add(Duration(days: 180)),
+                          ),
+                        ],
                       ),
                     ),
                     Padding(

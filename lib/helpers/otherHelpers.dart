@@ -11,10 +11,8 @@ import 'package:flutter_html_to_pdf/flutter_html_to_pdf.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:pdf/pdf.dart';
 
 import 'package:permission_handler/permission_handler.dart';
-import 'package:printing/printing.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -178,17 +176,15 @@ class Helper {
         ? invoice
         : await InvoiceFormatter().generateInvoice(sellId, taxId, context);
     
-    // Use the modern approach for PDF generation
-    await Printing.layoutPdf(
-        onLayout: (PdfPageFormat format) async {
-          // Note: convertHtml is deprecated but still functional
-          // TODO: Migrate to newer PDF generation method when available
-          // ignore: deprecated_member_use
-          return await Printing.convertHtml(
-            format: format,
-            html: _invoice,
-          );
-        });
+    // Generate PDF from HTML content using flutter_html_to_pdf
+    var targetPath = await getTemporaryDirectory();
+    var targetFileName = "invoice_no_${Random().nextInt(100)}";
+    
+    var generatedPdfFile = await FlutterHtmlToPdf.convertFromHtmlContent(
+        _invoice, targetPath.path, targetFileName);
+    
+    // Share the generated PDF file
+    await Share.shareXFiles([XFile(generatedPdfFile.path)]);
   }
 
   // //request permissions
@@ -257,12 +253,14 @@ class Helper {
     String _invoice = (invoice != null)
         ? invoice
         : await InvoiceFormatter().generateInvoice(sellId, taxId, context);
+    
+    // Generate PDF from HTML content using flutter_html_to_pdf
     var targetPath = await getTemporaryDirectory();
-    var targetFileName = "invoice_no: ${Random().nextInt(100)}";
-
+    var targetFileName = "invoice_no_${Random().nextInt(100)}";
+    
     var generatedPdfFile = await FlutterHtmlToPdf.convertFromHtmlContent(
         _invoice, targetPath.path, targetFileName);
-
+    
     await Share.shareXFiles([XFile(generatedPdfFile.path)]);
     //to get file path use generatedPdfFile.path
   }

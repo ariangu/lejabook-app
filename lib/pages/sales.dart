@@ -6,7 +6,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
-import 'package:search_choices/search_choices.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import 'package:syncfusion_flutter_datepicker/datepicker.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -1448,31 +1448,35 @@ class _SalesState extends State<Sales> {
   }
 
   Widget customers() {
-    return SearchChoices.single(
-      underline: Visibility(
-        child: Container(),
-        visible: false,
-      ),
-      displayClearIcon: false,
-      value: jsonEncode(selectedCustomer),
-      items: customerListMap.map<DropdownMenuItem<String>>((Map value) {
-        return DropdownMenuItem<String>(
-            value: jsonEncode(value),
-            child: Container(
-              width: MySize.screenWidth! * 0.8,
-              child: Text("${value['name']} (${value['mobile'] ?? ' - '})",
-                  softWrap: true,
-                  overflow: TextOverflow.ellipsis,
-                  style: AppTheme.getTextStyle(themeData.textTheme.bodyMedium,
-                      color: themeData.colorScheme.onSurface)),
-            ));
-      }).toList(),
-      onChanged: (value) async {
-        setState(() {
-          selectedCustomer = jsonDecode(value);
-        });
+    return DropdownSearch<Map<dynamic, dynamic>>(
+      selectedItem: selectedCustomer,
+      items: customerListMap,
+      itemAsString: (Map<dynamic, dynamic> value) => "${value['name']} (${value['mobile'] ?? ' - '})",
+      onChanged: (Map<dynamic, dynamic>? newValue) async {
+        if (newValue != null) {
+          setState(() {
+            selectedCustomer = newValue;
+          });
+        }
       },
-      isExpanded: true,
+      dropdownButton: Icon(Icons.arrow_drop_down, color: Colors.blue),
+      dropdownSearchDecoration: InputDecoration(
+        border: UnderlineInputBorder(),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      ),
+      popupItemBuilder: (context, item, isSelected) {
+        return Container(
+          width: MySize.screenWidth! * 0.8,
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Text(
+            "${item['name']} (${item['mobile'] ?? ' - '})",
+            softWrap: true,
+            overflow: TextOverflow.ellipsis,
+            style: AppTheme.getTextStyle(themeData.textTheme.bodyMedium,
+                color: themeData.colorScheme.onSurface),
+          ),
+        );
+      },
     );
   }
 
