@@ -42,46 +42,53 @@ class Splash extends StatelessWidget {
               Text(AppLocalizations.of(context).translate('welcome'),
                   style: AppTheme.getTextStyle(themeData.textTheme.headlineLarge,
                       color: themeData.colorScheme.onSurface)),
-              ElevatedButton.icon(
-                onPressed: () async {
-                  await Helper().requestAppPermission();
-                  SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                  if (prefs.getInt('userId') != null) {
-                    USERID = prefs.getInt('userId');
-                    Config.userId = USERID;
-                    Helper().jobScheduler();
-                    //Take to home page
-                    Navigator.of(context).pushReplacementNamed('/home');
-                  } else
-                    Navigator.of(context).pushReplacementNamed('/login');
-                },
-                icon: Icon(Icons.navigate_next,
-                    color: themeData.colorScheme.primary),
-                label: Text(AppLocalizations.of(context).translate('login'),
-                    style: AppTheme.getTextStyle(themeData.textTheme.bodyLarge,
-                        color: themeData.colorScheme.primary, fontWeight: 600)),
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: themeData.colorScheme.onPrimary,
-                    shadowColor: themeData.colorScheme.primary),
-              ),
-              Visibility(
-                visible: Config().showRegister,
-                child: Padding(
-                  padding: EdgeInsets.all(MySize.size10!),
-                  child: GestureDetector(
-                    child: Text(
-                        AppLocalizations.of(context).translate('register'),
-                        style: AppTheme.getTextStyle(
-                            themeData.textTheme.bodyLarge,
-                            color: themeData.colorScheme.onSurface,
-                            fontWeight: 600)),
-                    onTap: () async {
-                      await launchUrl(Uri.parse('${Config.baseUrl}business/register'));
+              SizedBox(height: MySize.size20!),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton.icon(
+                    onPressed: () async {
+                      await Helper().requestAppPermission();
+                      SharedPreferences prefs =
+                          await SharedPreferences.getInstance();
+                      if (prefs.getInt('userId') != null) {
+                        USERID = prefs.getInt('userId');
+                        Config.userId = USERID;
+                        Helper().jobScheduler();
+                        //Take to home page
+                        Navigator.of(context).pushReplacementNamed('/home');
+                      } else
+                        Navigator.of(context).pushReplacementNamed('/login');
                     },
+                    icon: Icon(Icons.navigate_next,
+                        color: themeData.colorScheme.primary),
+                    label: Text(AppLocalizations.of(context).translate('login'),
+                        style: AppTheme.getTextStyle(themeData.textTheme.bodyLarge,
+                            color: themeData.colorScheme.primary, fontWeight: 600)),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: themeData.colorScheme.onPrimary,
+                        shadowColor: themeData.colorScheme.primary),
                   ),
-                ),
-              )
+                  SizedBox(width: MySize.size16!),
+                  Visibility(
+                    visible: Config().showRegister,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        await launchUrl(Uri.parse('${Config.baseUrl}business/register'));
+                      },
+                      icon: Icon(Icons.person_add,
+                          color: themeData.colorScheme.primary),
+                      label: Text(AppLocalizations.of(context).translate('register'),
+                          style: AppTheme.getTextStyle(
+                              themeData.textTheme.bodyLarge,
+                              color: themeData.colorScheme.primary, fontWeight: 600)),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: themeData.colorScheme.onPrimary,
+                          shadowColor: themeData.colorScheme.primary),
+                    ),
+                  ),
+                ],
+              ),
             ],
           ),
         ),
