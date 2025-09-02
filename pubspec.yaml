@@ -60,7 +60,8 @@ dependencies:
   # UI components
   # search_choices: ^2.3.5  # Temporarily commented out due to version conflicts
   # date_time_picker: ^2.1.0  # Temporarily commented out due to version conflicts
-  syncfusion_flutter_datepicker: ^29.1.38
+#  syncfusion_flutter_datepicker: ^29.1.38
+  syncfusion_flutter_datepicker: ^20.4.54
   
   # Image handling
   image_picker: ^1.0.4

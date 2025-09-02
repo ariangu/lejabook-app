@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 
 import 'config.dart';
 import 'helpers/AppTheme.dart';
+import 'helpers/color_extensions.dart'; // Import the color extension
 import 'helpers/routes.dart';
 import 'locale/MyLocalizations.dart';
 

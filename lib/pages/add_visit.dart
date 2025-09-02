@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:intl/intl.dart';
@@ -248,24 +246,46 @@ class _NewVisitFormState extends State<NewVisitForm> {
                           ),
                           Card(
                             margin: EdgeInsets.all(MySize.size5!),
-                            child: DateTimePicker(
-                              use24HourFormat: false,
-                              locale: Locale('en', 'US'),
-                              initialValue: visitOn,
-                              type: DateTimePickerType.dateTime,
-                              firstDate: DateTime.now(),
-                              lastDate: DateTime.now().add(Duration(days: 366)),
-                              dateMask: 'yyyy-MM-dd  hh:mm',
-                              style: AppTheme.getTextStyle(
-                                themeData.textTheme.bodyLarge,
-                                fontWeight: 700,
-                                color: themeData.colorScheme.primary,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      visitOn,
+                                      style: AppTheme.getTextStyle(
+                                        themeData.textTheme.bodyLarge,
+                                        fontWeight: 700,
+                                        color: themeData.colorScheme.primary,
+                                      ),
+                                    ),
+                                  ),
+                                  IconButton(
+                                    icon: Icon(Icons.calendar_today),
+                                    onPressed: () async {
+                                      final DateTime? picked = await showDatePicker(
+                                        context: context,
+                                        initialDate: DateTime.now(),
+                                        firstDate: DateTime.now(),
+                                        lastDate: DateTime.now().add(Duration(days: 366)),
+                                      );
+                                      if (picked != null) {
+                                        final TimeOfDay? time = await showTimePicker(
+                                          context: context,
+                                          initialTime: TimeOfDay.now(),
+                                        );
+                                        if (time != null) {
+                                          setState(() {
+                                            visitOn = DateFormat('yyyy-MM-dd HH:mm:ss').format(
+                                              DateTime(picked.year, picked.month, picked.day, time.hour, time.minute)
+                                            );
+                                          });
+                                        }
+                                      }
+                                    },
+                                  ),
+                                ],
                               ),
-                              onChanged: (val) {
-                                setState(() {
-                                  visitOn = val;
-                                });
-                              },
                             ),
                           ),
                         ],
@@ -375,7 +395,12 @@ class _NewVisitFormState extends State<NewVisitForm> {
   Widget customerList() {
     return DropdownSearch<Map<String, dynamic>>(
       selectedItem: selectedCustomer,
-      items: customerListMap,
+      items: (String filter) {
+        return customerListMap.where((item) => 
+          item['name'].toString().toLowerCase().contains(filter.toLowerCase()) ||
+          (item['mobile'] != null && item['mobile'].toString().toLowerCase().contains(filter.toLowerCase()))
+        ).toList();
+      },
       itemAsString: (Map<String, dynamic> value) => "${value['name']} (${value['mobile'] ?? ' - '})",
       onChanged: (Map<String, dynamic>? newValue) async {
         if (newValue != null) {
