@@ -392,13 +392,15 @@ class _NewVisitFormState extends State<NewVisitForm> {
   }
 
   //dropdown widget for selecting customer
+  //dropdown widget for selecting customer
   Widget customerList() {
     return DropdownSearch<Map<String, dynamic>>(
       selectedItem: selectedCustomer,
-      items: (String filter) {
-        return customerListMap.where((item) => 
-          item['name'].toString().toLowerCase().contains(filter.toLowerCase()) ||
-          (item['mobile'] != null && item['mobile'].toString().toLowerCase().contains(filter.toLowerCase()))
+      items: (String filter, LoadProps? loadProps) async {
+        // Return the filtered list
+        return customerListMap.where((item) =>
+        item['name'].toString().toLowerCase().contains(filter.toLowerCase()) ||
+            (item['mobile'] != null && item['mobile'].toString().toLowerCase().contains(filter.toLowerCase()))
         ).toList();
       },
       itemAsString: (Map<String, dynamic> value) => "${value['name']} (${value['mobile'] ?? ' - '})",
