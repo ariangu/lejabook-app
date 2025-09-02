@@ -9,8 +9,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:intl/intl.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 
@@ -32,9 +32,8 @@ class VisitForm extends StatefulWidget {
 
 class _VisitFormState extends State<VisitForm> {
   String visitStatus = '', location = '';
-  XFile? _image;
+  PlatformFile? _image;
   bool isLoading = false, showMeet2 = false, showMeet3 = false;
-  final ImagePicker _picker = ImagePicker();
   final _formKey = GlobalKey<FormState>();
   LatLng? currentLoc;
 
@@ -625,10 +624,17 @@ class _VisitFormState extends State<VisitForm> {
                                   msg: AppLocalizations.of(context).translate(
                                       'please_upload_image_of_visited_place'));
                             } else {
-                              File imageFile = new File(_image!.path);
-                              List<int> imageBytes =
-                                  imageFile.readAsBytesSync();
-                              placeImage = base64Encode(imageBytes);
+                              if (_image!.path != null) {
+                                File imageFile = new File(_image!.path!);
+                                List<int> imageBytes =
+                                    imageFile.readAsBytesSync();
+                                placeImage = base64Encode(imageBytes);
+                              } else {
+                                validated = false;
+                                Fluttertoast.showToast(
+                                    msg: AppLocalizations.of(context).translate(
+                                        'invalid_image_file'));
+                              }
                             }
 
                             if (currentLoc == null) {
@@ -694,10 +700,10 @@ class _VisitFormState extends State<VisitForm> {
 
   //image from camera
   _imgFromCamera() async {
-    XFile? image = await _picker.pickImage(
-        source: ImageSource.camera); //, imageQuality: 50);
+    FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.image); //, imageQuality: 50);
     setState(() {
-      _image = image;
+      _image = result?.files.first;
     });
   }
 }

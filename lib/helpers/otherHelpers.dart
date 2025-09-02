@@ -15,7 +15,7 @@ import 'package:pdf/pdf.dart';
 
 import 'package:permission_handler/permission_handler.dart';
 import 'package:printing/printing.dart';
-import 'package:share/share.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../config.dart';
@@ -99,8 +99,8 @@ class Helper {
   //check internet connectivity
   Future<bool> checkConnectivity() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
-    if (connectivityResult.contains(ConnectivityResult.mobile) ||
-        connectivityResult.contains(ConnectivityResult.wifi)) {
+    if (connectivityResult == ConnectivityResult.mobile ||
+        connectivityResult == ConnectivityResult.wifi) {
       return true;
     } else {
       return false;
@@ -263,7 +263,7 @@ class Helper {
     var generatedPdfFile = await FlutterHtmlToPdf.convertFromHtmlContent(
         _invoice, targetPath.path, targetFileName);
 
-    await Share.shareFiles([generatedPdfFile.path]);
+    await Share.shareXFiles([XFile(generatedPdfFile.path)]);
     //to get file path use generatedPdfFile.path
   }
 

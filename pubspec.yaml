@@ -21,8 +21,8 @@ dependencies:
 
   # --- device & platform ---
   app_settings: ^6.1.1
-  connectivity_plus: ^6.0.3
-  image_picker: ^1.1.2
+  connectivity_plus: ^5.0.2
+  file_picker: ^6.1.1  # Instead of image_picker
   path_provider: ^2.1.4
   permission_handler: ^12.0.1
   shared_preferences: ^2.3.2
@@ -43,7 +43,7 @@ dependencies:
   printing: ^5.13.1
   html_to_pdf: ^0.8.1          # upgraded
   flutter_html_to_pdf: ^0.7.0
-  share: ^2.0.4
+  share_plus: ^10.0.2
 
   # --- barcode / qr ---
   barcode_scan2: ^4.3.3
@@ -57,7 +57,7 @@ dependencies:
   url_launcher: ^6.3.0
   video_player: ^2.9.1
   search_choices: ^2.2.9
-  google_maps_flutter: ^2.9.0
+  flutter_map: ^6.1.0  # Free OpenStreetMap alternative
 
 dev_dependencies:
   flutter_test:
