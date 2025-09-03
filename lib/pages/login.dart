@@ -55,7 +55,7 @@ class _LoginState extends State<Login> {
     MySize().init(context);
     
     return Scaffold(
-      backgroundColor: themeData.colorScheme.primary,
+      backgroundColor: Color(0xFF255539),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
@@ -94,7 +94,7 @@ class _LoginState extends State<Login> {
                                 return Icon(
                                   Icons.business,
                                   size: 60,
-                                  color: themeData.colorScheme.primary,
+                                  color: Color(0xFF255539),
                                 );
                               },
                             ),
@@ -181,7 +181,7 @@ class _LoginState extends State<Login> {
                                   ),
                                   prefixIcon: Icon(
                                     MdiIcons.emailOutline,
-                                    color: themeData.colorScheme.primary,
+                                    color: Color(0xFF255539),
                                   ),
                                   border: InputBorder.none,
                                   contentPadding: EdgeInsets.symmetric(
@@ -235,14 +235,14 @@ class _LoginState extends State<Login> {
                                   ),
                                   prefixIcon: Icon(
                                     MdiIcons.lockOutline,
-                                    color: themeData.colorScheme.primary,
+                                    color: Color(0xFF255539),
                                   ),
                                   suffixIcon: IconButton(
                                     icon: Icon(
                                       _passwordVisible
                                           ? MdiIcons.eyeOutline
                                           : MdiIcons.eyeOffOutline,
-                                      color: themeData.colorScheme.primary,
+                                      color: Color(0xFF255539),
                                     ),
                                     onPressed: () {
                                       setState(() {
@@ -318,7 +318,7 @@ class _LoginState extends State<Login> {
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: themeData.colorScheme.primary,
+                                  backgroundColor: Color(0xFF255539),
                                   foregroundColor: Colors.white,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(12),
@@ -381,7 +381,7 @@ class _LoginState extends State<Login> {
                                     style: TextStyle(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
-                                      color: themeData.colorScheme.primary,
+                                      color: Color(0xFF255539),
                                     ),
                                   ),
                                 ),
