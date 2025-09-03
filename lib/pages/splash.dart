@@ -12,10 +12,39 @@ import '../locale/MyLocalizations.dart';
 import '../pages/login.dart';
 
 // ignore: must_be_immutable
-class Splash extends StatelessWidget {
+class Splash extends StatefulWidget {
+  @override
+  _SplashState createState() => _SplashState();
+}
+
+class _SplashState extends State<Splash> {
   static int themeType = 1;
   ThemeData themeData = AppTheme.getThemeFromThemeMode(themeType);
   CustomAppTheme customAppTheme = AppTheme.getCustomAppTheme(themeType);
+
+  @override
+  void initState() {
+    super.initState();
+    // Automatically check login status after a short delay
+    Future.delayed(Duration(seconds: 2), () {
+      _checkLoginStatus();
+    });
+  }
+
+  Future<void> _checkLoginStatus() async {
+    await Helper().requestAppPermission();
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    
+    if (prefs.getInt('userId') != null) {
+      USERID = prefs.getInt('userId');
+      Config.userId = USERID;
+      Helper().jobScheduler();
+      // Take to home page
+      Navigator.of(context).pushReplacementNamed('/home');
+    } else {
+      Navigator.of(context).pushReplacementNamed('/login');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,17 +77,7 @@ class Splash extends StatelessWidget {
                 children: [
                   ElevatedButton.icon(
                     onPressed: () async {
-                      await Helper().requestAppPermission();
-                      SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      if (prefs.getInt('userId') != null) {
-                        USERID = prefs.getInt('userId');
-                        Config.userId = USERID;
-                        Helper().jobScheduler();
-                        //Take to home page
-                        Navigator.of(context).pushReplacementNamed('/home');
-                      } else
-                        Navigator.of(context).pushReplacementNamed('/login');
+                      await _checkLoginStatus();
                     },
                     icon: Icon(Icons.navigate_next,
                         color: themeData.colorScheme.primary),
