@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../apis/api.dart';
 import '../apis/system.dart';
@@ -51,217 +52,332 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     themeData = Theme.of(context);
+    MySize().init(context);
+    
     return Scaffold(
+      backgroundColor: themeData.colorScheme.primary,
       body: SafeArea(
-        child: ListView(
-          padding: EdgeInsets.all(0),
-          children: <Widget>[
-            Container(
-              height: MediaQuery.of(context).size.height * 3 / 10,
-              child: Stack(
-                fit: StackFit.expand,
-                children: <Widget>[
-                  FittedBox(
-                    fit: BoxFit.fill,
-                    child: CachedNetworkImage(
-                      imageUrl: Config().loginScreen,
-                      placeholder: (context, url) => Transform.scale(
-                        scale: 0.07,
-                        child: CircularProgressIndicator(),
-                      ),
-                      errorWidget: (context, url, error) =>
-                          Image.asset('assets/images/login.jpg'),
-                    ),
-                  ),
-                  Align(
-                    alignment: Alignment.center,
-                    child: Stack(
-                      children: <Widget>[
-                        // Stroked text as border.
-                        Text(
-                          AppLocalizations.of(context).translate('login'),
-                          style: TextStyle(
-                            fontSize: 30,
-                            foreground: Paint()
-                              ..style = PaintingStyle.stroke
-                              ..strokeWidth = 2
-                              ..color = Colors.green,
-                          ),
-                        ),
-                        // Solid text as fill.
-                        Text(
-                          AppLocalizations.of(context).translate('login'),
-                          style: TextStyle(
-                            fontSize: 30,
+        child: SingleChildScrollView(
+          child: Container(
+            height: MediaQuery.of(context).size.height,
+            child: Column(
+              children: [
+                // Top section with logo and title
+                Expanded(
+                  flex: 2,
+                  child: Container(
+                    width: double.infinity,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // Logo
+                        Container(
+                          width: 120,
+                          height: 120,
+                          decoration: BoxDecoration(
                             color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 10,
+                                offset: Offset(0, 5),
+                              ),
+                            ],
                           ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Form(
-              key: _formKey,
-              child: Container(
-                margin: EdgeInsets.only(
-                    left: MySize.size16!,
-                    right: MySize.size16!,
-                    top: MySize.size16!),
-                child: Card(
-                  elevation: 8,
-                  child: Padding(
-                    padding: EdgeInsets.only(
-                        top: MySize.size12!,
-                        left: MySize.size16!,
-                        right: MySize.size16!,
-                        bottom: MySize.size12!),
-                    child: Column(children: <Widget>[
-                      TextFormField(
-                        style: AppTheme.getTextStyle(
-                            themeData.textTheme.bodyLarge,
-                            letterSpacing: 0.1,
-                            color: themeData.colorScheme.onSurface,
-                            fontWeight: 500),
-                        decoration: InputDecoration(
-                          hintText: AppLocalizations.of(context)
-                              .translate('username'),
-                          hintStyle: AppTheme.getTextStyle(
-                              themeData.textTheme.titleSmall,
-                              letterSpacing: 0.1,
-                              color: themeData.colorScheme.onSurface,
-                              fontWeight: 500),
-                          prefixIcon: Icon(MdiIcons.emailOutline),
-                        ),
-                        controller: usernameController,
-                        validator: (value) {
-                          if (value!.isEmpty) {
-                            return AppLocalizations.of(context)
-                                .translate('please_enter_username');
-                          }
-                          return null;
-                        },
-                        autofocus: true,
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: MySize.size16!),
-                        child: TextFormField(
-                          keyboardType: TextInputType.visiblePassword,
-                          style: AppTheme.getTextStyle(
-                              themeData.textTheme.bodyLarge,
-                              letterSpacing: 0.1,
-                              color: themeData.colorScheme.onSurface,
-                              fontWeight: 500),
-                          decoration: InputDecoration(
-                            hintText: AppLocalizations.of(context)
-                                .translate('password'),
-                            hintStyle: AppTheme.getTextStyle(
-                                themeData.textTheme.titleSmall,
-                                letterSpacing: 0.1,
-                                color: themeData.colorScheme.onSurface,
-                                fontWeight: 500),
-                            prefixIcon: Icon(MdiIcons.lockOutline),
-                            suffixIcon: IconButton(
-                              icon: Icon(_passwordVisible
-                                  ? MdiIcons.eyeOutline
-                                  : MdiIcons.eyeOffOutline),
-                              onPressed: () {
-                                setState(() {
-                                  _passwordVisible = !_passwordVisible;
-                                });
+                          child: Padding(
+                            padding: EdgeInsets.all(20),
+                            child: Image.asset(
+                              'assets/icon/pos.png',
+                              fit: BoxFit.contain,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(
+                                  Icons.business,
+                                  size: 60,
+                                  color: themeData.colorScheme.primary,
+                                );
                               },
                             ),
                           ),
-                          obscureText: !_passwordVisible,
-                          controller: passwordController,
-                          validator: (value) {
-                            if (value!.isEmpty) {
-                              return AppLocalizations.of(context)
-                                  .translate('please_enter_password');
-                            }
-                            return null;
-                          },
                         ),
-                      ),
-                      Container(
-                        margin: EdgeInsets.only(top: MySize.size16!),
-                        decoration: BoxDecoration(
-                          borderRadius:
-                              BorderRadius.all(Radius.circular(MySize.size24!)),
-                          boxShadow: [
-                            BoxShadow(
-                              color: themeData.colorScheme.primary,
-                              blurRadius: 2,
-                              offset: Offset(0, 1),
-                            ),
-                          ],
+                        SizedBox(height: MySize.size24!),
+                        // Sign In Title
+                        Text(
+                          'Sign In',
+                          style: TextStyle(
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                            letterSpacing: 1.2,
+                          ),
                         ),
-                        child: TextButton(
-                            style: TextButton.styleFrom(
-                              padding: EdgeInsets.only(
-                                  left: MySize.size64!,
-                                  right: MySize.size64!,
-                                  top: MySize.size10!,
-                                  bottom: MySize.size10!),
-                              shape: RoundedRectangleBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(MySize.size24!)),
-                              foregroundColor: themeData.colorScheme.primary,
-                            ),
-                            child: Text(
-                                isLoading
-                                    ? AppLocalizations.of(context)
-                                        .translate('loading')
-                                    : AppLocalizations.of(context)
-                                        .translate('login'),
-                                style: AppTheme.getTextStyle(
-                                    themeData.textTheme.labelLarge,
-                                    fontWeight: 600,
-                                    color: themeData.colorScheme.onPrimary,
-                                    letterSpacing: 0.5)),
-                            onPressed: () async {
-                              if (await Helper().checkConnectivity()) {
-                                if (_formKey.currentState!.validate() &&
-                                    !isLoading) {
-                                  setState(() {
-                                    isLoading = true;
-                                  });
-
-                                  Map? loginResponse = await Api().login(
-                                      usernameController.text,
-                                      passwordController.text);
-
-                                  if (loginResponse!['success']) {
-                                    //schedule job for syncing callLogs
-                                    Helper().jobScheduler();
-                                    //Get current logged in user details and save it.
-
-                                    showLoadingDialogue();
-                                    await loadAllData(loginResponse, context);
-                                    Navigator.of(context).pop();
-
-                                    //Take to home page
-                                    Navigator.of(context).pushNamed('/home');
-                                  } else {
-                                    setState(() {
-                                      isLoading = false;
-                                    });
-
-                                    Fluttertoast.showToast(
-                                        msg: AppLocalizations.of(context)
-                                            .translate('invalid_credentials'));
-                                  }
-                                }
-                              }
-                            }),
-                      ),
-                    ]),
+                        SizedBox(height: MySize.size12!),
+                        // Welcome subtitle
+                        Text(
+                          'Welcome back! Please enter your details',
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.white.withOpacity(0.9),
+                            letterSpacing: 0.5,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            )
-          ],
+                
+                // Form section
+                Expanded(
+                  flex: 3,
+                  child: Container(
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(30),
+                        topRight: Radius.circular(30),
+                      ),
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Padding(
+                        padding: EdgeInsets.all(MySize.size24!),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            SizedBox(height: MySize.size16!),
+                            
+                            // Username field
+                            Text(
+                              'Username',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: themeData.colorScheme.onSurface,
+                              ),
+                            ),
+                            SizedBox(height: MySize.size8!),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.grey[300]!,
+                                  width: 1,
+                                ),
+                              ),
+                              child: TextFormField(
+                                controller: usernameController,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: themeData.colorScheme.onSurface,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: 'Enter your username',
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey[500],
+                                    fontSize: 16,
+                                  ),
+                                  prefixIcon: Icon(
+                                    MdiIcons.emailOutline,
+                                    color: themeData.colorScheme.primary,
+                                  ),
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: MySize.size16!,
+                                    vertical: MySize.size16!,
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Please enter username';
+                                  }
+                                  return null;
+                                },
+                                autofocus: true,
+                              ),
+                            ),
+                            
+                            SizedBox(height: MySize.size20!),
+                            
+                            // Password field
+                            Text(
+                              'Password',
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: themeData.colorScheme.onSurface,
+                              ),
+                            ),
+                            SizedBox(height: MySize.size8!),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.grey[50],
+                                borderRadius: BorderRadius.circular(12),
+                                border: Border.all(
+                                  color: Colors.grey[300]!,
+                                  width: 1,
+                                ),
+                              ),
+                              child: TextFormField(
+                                controller: passwordController,
+                                obscureText: !_passwordVisible,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: themeData.colorScheme.onSurface,
+                                ),
+                                decoration: InputDecoration(
+                                  hintText: 'Enter your password',
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey[500],
+                                    fontSize: 16,
+                                  ),
+                                  prefixIcon: Icon(
+                                    MdiIcons.lockOutline,
+                                    color: themeData.colorScheme.primary,
+                                  ),
+                                  suffixIcon: IconButton(
+                                    icon: Icon(
+                                      _passwordVisible
+                                          ? MdiIcons.eyeOutline
+                                          : MdiIcons.eyeOffOutline,
+                                      color: themeData.colorScheme.primary,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _passwordVisible = !_passwordVisible;
+                                      });
+                                    },
+                                  ),
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.symmetric(
+                                    horizontal: MySize.size16!,
+                                    vertical: MySize.size16!,
+                                  ),
+                                ),
+                                validator: (value) {
+                                  if (value!.isEmpty) {
+                                    return 'Please enter password';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                            
+                            SizedBox(height: MySize.size32!),
+                            
+                            // Login button
+                            Container(
+                              width: double.infinity,
+                              height: 56,
+                              child: ElevatedButton(
+                                onPressed: () async {
+                                  if (await Helper().checkConnectivity()) {
+                                    if (_formKey.currentState!.validate() &&
+                                        !isLoading) {
+                                      setState(() {
+                                        isLoading = true;
+                                      });
+
+                                      Map? loginResponse = await Api().login(
+                                          usernameController.text,
+                                          passwordController.text);
+
+                                      if (loginResponse != null && loginResponse['success']) {
+                                        //schedule job for syncing callLogs
+                                        Helper().jobScheduler();
+                                        //Get current logged in user details and save it.
+
+                                        showLoadingDialogue();
+                                        await loadAllData(loginResponse, context);
+                                        Navigator.of(context).pop();
+
+                                        //Take to home page
+                                        Navigator.of(context).pushNamed('/home');
+                                      } else {
+                                        setState(() {
+                                          isLoading = false;
+                                        });
+
+                                        String errorMessage = 'Invalid credentials';
+                                        if (loginResponse != null && loginResponse['error'] != null) {
+                                          errorMessage = loginResponse['error'];
+                                        }
+                                        
+                                        Fluttertoast.showToast(
+                                            msg: errorMessage);
+                                      }
+                                    }
+                                  }
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: themeData.colorScheme.primary,
+                                  foregroundColor: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  elevation: 2,
+                                ),
+                                child: isLoading
+                                    ? SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                        ),
+                                      )
+                                    : Text(
+                                        'Sign In',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          fontWeight: FontWeight.w600,
+                                          letterSpacing: 0.5,
+                                        ),
+                                      ),
+                              ),
+                            ),
+                            
+                            Spacer(),
+                            
+                            // Sign up section
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Don't have an account? ",
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.grey[600],
+                                  ),
+                                ),
+                                GestureDetector(
+                                  onTap: () async {
+                                    await launchUrl(Uri.parse('${Config.baseUrl}business/register'));
+                                  },
+                                  child: Text(
+                                    'Sign Up',
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.bold,
+                                      color: themeData.colorScheme.primary,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            
+                            SizedBox(height: MySize.size16!),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );
