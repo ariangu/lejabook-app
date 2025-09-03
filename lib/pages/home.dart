@@ -512,29 +512,57 @@ class _HomeState extends State<Home> {
     }
   }
 
-  block({Color? backgroundColor, String? subject, amount}) {
+  block({Color? backgroundColor, String? subject, amount, IconData? icon}) {
     ThemeData themeData = Theme.of(context);
     return Card(
       clipBehavior: Clip.antiAliasWithSaveLayer,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(MySize.size8!),
+        borderRadius: BorderRadius.circular(MySize.size12!),
       ),
+      elevation: 3,
       child: Container(
-        color: backgroundColor,
-        height: MySize.size120,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(MySize.size12!),
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: backgroundColor == Colors.blue 
+                ? [Color(0xFF2196F3), Color(0xFF1976D2)] // Professional Blue
+                : backgroundColor == Colors.red
+                    ? [Color(0xFFF44336), Color(0xFFD32F2F)] // Professional Red
+                    : backgroundColor == Colors.green
+                        ? [Color(0xFF4CAF50), Color(0xFF388E3C)] // Professional Green
+                        : [Color(0xFFFF9800), Color(0xFFF57C00)], // Professional Orange
+          ),
+        ),
+        height: MySize.size140,
         child: Container(
-          padding:
-              EdgeInsets.only(bottom: MySize.size16!, left: MySize.size16!),
+          padding: EdgeInsets.all(MySize.size16!),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
+              // Large Icon at the top
+              Row(
+                children: [
+                  Icon(
+                    icon ?? Icons.analytics,
+                    color: Colors.white,
+                    size: 32, // Bigger icon
+                  ),
+                  Spacer(),
+                ],
+              ),
+              SizedBox(height: MySize.size12!),
+              // Smaller, professional font for title
               Text(subject!,
-                  style: AppTheme.getTextStyle(themeData.textTheme.titleMedium,
-                      fontWeight: 600, color: Colors.white)),
-              Text("$amount",
                   style: AppTheme.getTextStyle(themeData.textTheme.bodySmall,
-                      fontWeight: 500, color: Colors.white, letterSpacing: 0)),
+                      fontWeight: 500, color: Colors.white, fontSize: 12)),
+              SizedBox(height: MySize.size4!),
+              // Larger, bold font for amount
+              Text("$amount",
+                  style: AppTheme.getTextStyle(themeData.textTheme.titleMedium,
+                      fontWeight: 700, color: Colors.white, fontSize: 16)),
             ],
           ),
         ),
@@ -557,32 +585,32 @@ class _HomeState extends State<Home> {
           padding: EdgeInsets.only(
               left: MySize.size16!, right: MySize.size16!, top: MySize.size16!),
           mainAxisSpacing: MySize.size16!,
-          childAspectRatio: 5 / 4,
+          childAspectRatio: 1.1, // Slightly taller cards for better icon display
           crossAxisSpacing: MySize.size16!,
           children: <Widget>[
             block(
               amount: Helper().formatQuantity(totalSales),
-              subject:
-                  AppLocalizations.of(context).translate('number_of_sales'),
+              subject: AppLocalizations.of(context).translate('number_of_sales'),
               backgroundColor: Colors.blue,
+              icon: Icons.shopping_cart, // Professional shopping cart icon
             ),
             block(
-              amount: '$businessSymbol ' +
-                  Helper().formatCurrency(totalSalesAmount),
+              amount: '$businessSymbol ' + Helper().formatCurrency(totalSalesAmount),
               subject: AppLocalizations.of(context).translate('sales_amount'),
               backgroundColor: Colors.red,
+              icon: Icons.attach_money, // Professional money icon
             ),
             block(
-              amount: '$businessSymbol ' +
-                  Helper().formatCurrency(totalReceivedAmount),
+              amount: '$businessSymbol ' + Helper().formatCurrency(totalReceivedAmount),
               subject: AppLocalizations.of(context).translate('paid_amount'),
               backgroundColor: Colors.green,
+              icon: Icons.credit_card, // Professional credit card icon
             ),
             block(
-              amount:
-                  '$businessSymbol ' + Helper().formatCurrency(totalDueAmount),
+              amount: '$businessSymbol ' + Helper().formatCurrency(totalDueAmount),
               subject: AppLocalizations.of(context).translate('due_amount'),
               backgroundColor: Colors.orange,
+              icon: Icons.money_off, // Professional money-off icon
             ),
           ]),
     );
@@ -591,62 +619,50 @@ class _HomeState extends State<Home> {
   //widget for payment details
   Widget paymentDetails() {
     return Container(
-      padding: EdgeInsets.all(MySize.size8!),
-      margin: EdgeInsets.all(MySize.size16!),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.all(Radius.circular(MySize.size8!)),
-        color: customAppTheme.bgLayer1,
-        border: Border.all(color: customAppTheme.bgLayer4, width: 1.2),
-      ),
-      child: Column(
-        children: <Widget>[
-          Text(AppLocalizations.of(context).translate('payment_details'),
-              style: AppTheme.getTextStyle(themeData.textTheme.titleMedium,
-                  fontWeight: 700, letterSpacing: -0.2)),
-          ListView.builder(
-              physics: NeverScrollableScrollPhysics(),
-              padding: EdgeInsets.all(10),
-              itemCount: method.length,
-              shrinkWrap: true,
-              itemBuilder: (context, index) {
-                return Container(
-                  padding: EdgeInsets.only(bottom: 5),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: <Widget>[
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: <Widget>[
-                          Row(
-                            children: <Widget>[
-                              Container(
-                                height: 30,
-                                width: 2,
-                                decoration: BoxDecoration(
-                                  color: Colors.blue.withOpacity(0.5),
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(4.0)),
-                                ),
-                              ),
-                              Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 2)),
-                              Text(method[index]['key']),
-                            ],
-                          )
-                        ],
-                      ),
-                      Padding(padding: EdgeInsets.symmetric(horizontal: 4)),
-                      Column(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: <Widget>[
-                            Text('$businessSymbol ' +
-                                Helper().formatCurrency(method[index]['value']))
-                          ])
-                    ],
-                  ),
-                );
-              })
-        ],
+      width: double.infinity,
+      margin: EdgeInsets.symmetric(horizontal: MySize.size16!),
+      child: ElevatedButton(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          padding: EdgeInsets.symmetric(vertical: MySize.size16!),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(MySize.size12!),
+          ),
+          elevation: 0,
+        ),
+        onPressed: () {
+          // Payment details action
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(MySize.size12!),
+            gradient: LinearGradient(
+              begin: Alignment.centerLeft,
+              end: Alignment.centerRight,
+              colors: [Color(0xFF2196F3), Color(0xFF1976D2)], // Professional Blue gradient
+            ),
+          ),
+          padding: EdgeInsets.symmetric(vertical: MySize.size16!),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.payment,
+                color: Colors.white,
+                size: 24, // Professional icon size
+              ),
+              SizedBox(width: MySize.size8!),
+              Text(
+                AppLocalizations.of(context).translate('payment_details'),
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14, // Smaller, professional font
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -695,15 +711,12 @@ class _HomeState extends State<Home> {
               margin: EdgeInsets.symmetric(horizontal: MySize.size16!),
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: (!checkedIn!)
-                      ? Colors.green
-                      : Colors.red,
-                  foregroundColor: Colors.white,
+                  backgroundColor: Colors.transparent,
                   padding: EdgeInsets.symmetric(vertical: MySize.size16!),
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(MySize.size8!),
+                    borderRadius: BorderRadius.circular(MySize.size12!),
                   ),
-                  elevation: 2,
+                  elevation: 0,
                 ),
                 onPressed: syncPressed ? null : () async {
                   Helper().syncCallLogs();
@@ -880,35 +893,49 @@ class _HomeState extends State<Home> {
                     },
                   );
                 },
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    if (syncPressed)
-                      Container(
-                        width: 20,
-                        height: 20,
-                        margin: EdgeInsets.only(right: MySize.size8!),
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                child: Container(
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(MySize.size12!),
+                    gradient: LinearGradient(
+                      begin: Alignment.centerLeft,
+                      end: Alignment.centerRight,
+                      colors: (!checkedIn!) 
+                          ? [Color(0xFF4CAF50), Color(0xFF388E3C)] // Professional Green
+                          : [Color(0xFFF44336), Color(0xFFD32F2F)], // Professional Red
+                    ),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: MySize.size16!),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      if (syncPressed)
+                        Container(
+                          width: 20,
+                          height: 20,
+                          margin: EdgeInsets.only(right: MySize.size8!),
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        ),
+                      Icon(
+                        (!checkedIn!) ? Icons.login : Icons.logout,
+                        color: Colors.white,
+                        size: 24, // Professional icon size
+                      ),
+                      SizedBox(width: MySize.size8!),
+                      Text(
+                        (!checkedIn!)
+                            ? AppLocalizations.of(context).translate('check_in')
+                            : AppLocalizations.of(context).translate('check_out'),
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14, // Smaller, professional font
                         ),
                       ),
-                    Icon(
-                      (!checkedIn!) ? Icons.login : Icons.logout,
-                      size: 20,
-                    ),
-                    SizedBox(width: MySize.size8!),
-                    Text(
-                      (!checkedIn!)
-                          ? AppLocalizations.of(context).translate('check_in')
-                          : AppLocalizations.of(context).translate('check_out'),
-                      style: AppTheme.getTextStyle(
-                        themeData.textTheme.titleMedium,
-                        color: Colors.white,
-                        fontWeight: 600,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -920,10 +947,10 @@ class _HomeState extends State<Home> {
                   vertical: MySize.size8!,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.green.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(MySize.size8!),
+                  color: Color(0xFF4CAF50).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(MySize.size12!),
                   border: Border.all(
-                    color: Colors.green.withOpacity(0.3),
+                    color: Color(0xFF4CAF50).withOpacity(0.3),
                     width: 1,
                   ),
                 ),
@@ -932,16 +959,16 @@ class _HomeState extends State<Home> {
                   children: [
                     Icon(
                       Icons.access_time,
-                      size: 16,
-                      color: Colors.green,
+                      size: 18,
+                      color: Color(0xFF4CAF50),
                     ),
                     SizedBox(width: MySize.size8!),
                     Text(
                       'Checked in: ${_formatDuration(DateTime.now().difference(clockInTime))}',
-                      style: AppTheme.getTextStyle(
-                        themeData.textTheme.bodyMedium,
-                        color: Colors.green,
-                        fontWeight: 500,
+                      style: TextStyle(
+                        color: Color(0xFF4CAF50),
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13,
                       ),
                     ),
                   ],
