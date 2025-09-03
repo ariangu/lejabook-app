@@ -280,35 +280,41 @@ class _LoginState extends State<Login> {
                                         isLoading = true;
                                       });
 
-                                      Map? loginResponse = await Api().login(
-                                          usernameController.text,
-                                          passwordController.text);
+                                      try {
+                                        Map? loginResponse = await Api().login(
+                                            usernameController.text,
+                                            passwordController.text);
 
-                                      if (loginResponse != null && loginResponse['success']) {
-                                        //schedule job for syncing callLogs
-                                        Helper().jobScheduler();
-                                        //Get current logged in user details and save it.
+                                        if (loginResponse != null && loginResponse['success']) {
+                                          //schedule job for syncing callLogs
+                                          Helper().jobScheduler();
+                                          //Get current logged in user details and save it.
 
-                                        showLoadingDialogue();
-                                        await loadAllData(loginResponse, context);
-                                        Navigator.of(context).pop();
+                                          await loadAllData(loginResponse, context);
+                                        } else {
+                                          setState(() {
+                                            isLoading = false;
+                                          });
 
-                                        //Take to home page
-                                        Navigator.of(context).pushNamed('/home');
-                                      } else {
+                                          String errorMessage = 'Invalid credentials';
+                                          if (loginResponse != null && loginResponse['error'] != null) {
+                                            errorMessage = loginResponse['error'];
+                                          }
+                                          
+                                          Fluttertoast.showToast(
+                                              msg: errorMessage);
+                                        }
+                                      } catch (e) {
                                         setState(() {
                                           isLoading = false;
                                         });
-
-                                        String errorMessage = 'Invalid credentials';
-                                        if (loginResponse != null && loginResponse['error'] != null) {
-                                          errorMessage = loginResponse['error'];
-                                        }
-                                        
                                         Fluttertoast.showToast(
-                                            msg: errorMessage);
+                                            msg: 'Login failed: $e');
                                       }
                                     }
+                                  } else {
+                                    Fluttertoast.showToast(
+                                        msg: 'Please check your internet connection');
                                   }
                                 },
                                 style: ElevatedButton.styleFrom(
@@ -320,13 +326,27 @@ class _LoginState extends State<Login> {
                                   elevation: 2,
                                 ),
                                 child: isLoading
-                                    ? SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                                        ),
+                                    ? Row(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          SizedBox(
+                                            width: 20,
+                                            height: 20,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                            ),
+                                          ),
+                                          SizedBox(width: 12),
+                                          Text(
+                                            'Signing In...',
+                                            style: TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              letterSpacing: 0.5,
+                                            ),
+                                          ),
+                                        ],
                                       )
                                     : Text(
                                         'Sign In',
@@ -384,56 +404,97 @@ class _LoginState extends State<Login> {
   }
 
   loadAllData(loginResponse, context) async {
-    timer = Timer.periodic(Duration(seconds: 30), (Timer t) {
-      (context != null)
-          ? Fluttertoast.showToast(
+    try {
+      // Show initial loading dialog
+      showLoadingDialogue();
+      
+      // Set up timer for long operations
+      timer = Timer.periodic(Duration(seconds: 30), (Timer t) {
+        if (context != null && Navigator.canPop(context)) {
+          Fluttertoast.showToast(
               msg: AppLocalizations.of(context)
-                  .translate('It_may_take_some_more_time_to_load'))
-          : t.cancel();
-      t.cancel();
-    });
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    Map loggedInUser = await User().get(loginResponse['access_token']);
+                  .translate('It_may_take_some_more_time_to_load'));
+        }
+        t.cancel();
+      });
 
-    USERID = loggedInUser['id'];
-    Config.userId = USERID;
-    //saving userId in disk
-    prefs.setInt('userId', USERID!);
-    DbProvider().initializeDatabase(loggedInUser['id']);
+      // Get user preferences and user details
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      Map loggedInUser = await User().get(loginResponse['access_token']);
 
-    String? lastSync = await System().getProductLastSync();
-    final date2 = DateTime.now();
+      // Set user ID and initialize database
+      USERID = loggedInUser['id'];
+      Config.userId = USERID;
+      prefs.setInt('userId', USERID!);
+      DbProvider().initializeDatabase(loggedInUser['id']);
 
-    //delete system table before saving data
-    System().empty();
-    //delete contact table
-    Contact().emptyContact();
-    //save user details
-    await System().insertUserDetails(loggedInUser);
-    //Insert token
-    System().insertToken(loginResponse['access_token']);
-    //save system data
-    await SystemApi().store();
-    await System().insertProductLastSyncDateTimeNow();
-    //check previous userId
-    if (prefs.getInt('prevUserId') == null ||
-        prefs.getInt('prevUserId') != prefs.getInt('userId')) {
-      SellDatabase().deleteSellTables();
-      await Variations().refresh();
-    } else {
-      //save variations if last sync is greater than 10hrs
-      if (lastSync == null ||
-          (date2.difference(DateTime.parse(lastSync)).inHours > 10)) {
-        if (await Helper().checkConnectivity()) {
-          await Variations().refresh();
-          await System().insertProductLastSyncDateTimeNow();
-          SellDatabase().deleteSellTables();
+      // Get last sync time
+      String? lastSync = await System().getProductLastSync();
+      final date2 = DateTime.now();
+
+      // Clear existing data
+      await System().empty();
+      await Contact().emptyContact();
+      
+      // Save user details and token
+      await System().insertUserDetails(loggedInUser);
+      System().insertToken(loginResponse['access_token']);
+      
+      // Load system data with progress indication
+      await _loadSystemDataWithProgress(context);
+      await System().insertProductLastSyncDateTimeNow();
+      
+      // Handle variations based on user change
+      if (prefs.getInt('prevUserId') == null ||
+          prefs.getInt('prevUserId') != prefs.getInt('userId')) {
+        SellDatabase().deleteSellTables();
+        await _loadVariationsWithProgress(context);
+      } else {
+        // Save variations if last sync is greater than 10hrs
+        if (lastSync == null ||
+            (date2.difference(DateTime.parse(lastSync)).inHours > 10)) {
+          if (await Helper().checkConnectivity()) {
+            await _loadVariationsWithProgress(context);
+            await System().insertProductLastSyncDateTimeNow();
+            SellDatabase().deleteSellTables();
+          }
         }
       }
+      
+      // Dismiss loading dialog and navigate
+      if (Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
+      Navigator.of(context).pushReplacementNamed('/home');
+      
+    } catch (e) {
+      print('Error in loadAllData: $e');
+      // Dismiss loading dialog on error
+      if (Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
+      Fluttertoast.showToast(msg: 'Error loading data: $e');
     }
-    //Take to home page
-    Navigator.of(context).pushReplacementNamed('/home');
-    Navigator.of(context).pop();
+  }
+
+  // Load system data with progress indication
+  Future<void> _loadSystemDataWithProgress(BuildContext context) async {
+    try {
+      await SystemApi().store();
+    } catch (e) {
+      print('Error loading system data: $e');
+      // Continue even if some system data fails to load
+    }
+  }
+
+  // Load variations with progress indication
+  Future<void> _loadVariationsWithProgress(BuildContext context) async {
+    try {
+      await Variations().refresh();
+    } catch (e) {
+      print('Error loading variations: $e');
+      // Continue even if variations fail to load
+    }
   }
 
   Future<void> showLoadingDialogue() async {
@@ -442,14 +503,44 @@ class _LoginState extends State<Login> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          content: Row(
-            children: [
-              CircularProgressIndicator(),
-              Container(
-                  margin: EdgeInsets.only(left: 5),
-                  child: Text(
-                      AppLocalizations.of(context).translate('loading_data'))),
-            ],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          content: Container(
+            padding: EdgeInsets.all(20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 60,
+                  height: 60,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 3,
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      themeData.colorScheme.primary,
+                    ),
+                  ),
+                ),
+                SizedBox(height: 16),
+                Text(
+                  AppLocalizations.of(context).translate('loading_data'),
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                    color: themeData.colorScheme.onSurface,
+                  ),
+                ),
+                SizedBox(height: 8),
+                Text(
+                  'Please wait while we load your data...',
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: themeData.colorScheme.onSurface.withOpacity(0.7),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
           ),
         );
       },

@@ -101,29 +101,36 @@ class _HomeState extends State<Home> {
 
   //permission for displaying Attendance Button
   checkIOButtonDisplay() async {
-    await Attendance().getCheckInTime(USERID).then((value) {
-      if (value != null) {
-        clockInTime = DateTime.parse(value);
-      }
-    });
-    //if someone has forget to check-in
-    //check attendance status
-    var activeSubscriptionDetails = await System().get('active-subscription');
-    if (activeSubscriptionDetails.length > 0 &&
-        activeSubscriptionDetails[0].containsKey('package_details')) {
-      Map<String, dynamic> packageDetails =
-          activeSubscriptionDetails[0]['package_details'];
-      if (packageDetails.containsKey('essentials_module') &&
-          packageDetails['essentials_module'].toString() == '1') {
-        //get attendance status(check-In/check-Out)
-        checkedIn = await Attendance().getAttendanceStatus(USERID);
-        setState(() {});
+    try {
+      await Attendance().getCheckInTime(USERID).then((value) {
+        if (value != null) {
+          clockInTime = DateTime.parse(value);
+        }
+      });
+      //if someone has forget to check-in
+      //check attendance status
+      var activeSubscriptionDetails = await System().get('active-subscription');
+      if (activeSubscriptionDetails != null && activeSubscriptionDetails.length > 0 &&
+          activeSubscriptionDetails[0].containsKey('package_details')) {
+        Map<String, dynamic> packageDetails =
+            activeSubscriptionDetails[0]['package_details'];
+        if (packageDetails.containsKey('essentials_module') &&
+            packageDetails['essentials_module'].toString() == '1') {
+          //get attendance status(check-In/check-Out)
+          checkedIn = await Attendance().getAttendanceStatus(USERID);
+          setState(() {});
+        } else {
+          setState(() {
+            checkedIn = null;
+          });
+        }
       } else {
         setState(() {
           checkedIn = null;
         });
       }
-    } else {
+    } catch (e) {
+      print('Error in checkIOButtonDisplay: $e');
       setState(() {
         checkedIn = null;
       });
@@ -683,165 +690,276 @@ class _HomeState extends State<Home> {
         padding: EdgeInsets.only(top: MySize.size10!),
         child: Column(
           children: <Widget>[
-            ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                foregroundColor: (!checkedIn!)
-                    ? themeData.colorScheme.primary
-                    : themeData.colorScheme.surface,
-              ),
-              onPressed: () async {
-                Helper().syncCallLogs();
-                showDialog(
-                    barrierDismissible: true,
+            Container(
+              width: double.infinity,
+              margin: EdgeInsets.symmetric(horizontal: MySize.size16!),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: (!checkedIn!)
+                      ? Colors.green
+                      : Colors.red,
+                  foregroundColor: Colors.white,
+                  padding: EdgeInsets.symmetric(vertical: MySize.size16!),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(MySize.size8!),
+                  ),
+                  elevation: 2,
+                ),
+                onPressed: syncPressed ? null : () async {
+                  Helper().syncCallLogs();
+                  showDialog(
+                    barrierDismissible: false,
                     context: context,
                     builder: (BuildContext context) {
                       return AlertDialog(
-                        title: Text(
-                            (!checkedIn!)
-                                ? AppLocalizations.of(context)
-                                    .translate('check_in_note')
-                                : AppLocalizations.of(context)
-                                    .translate('check_out_note'),
-                            textAlign: TextAlign.center,
-                            style: AppTheme.getTextStyle(
-                                themeData.textTheme.titleSmall,
-                                color: themeData.colorScheme.onSurface,
-                                fontWeight: 600,
-                                muted: true)),
-                        content: TextFormField(
-                            controller: note,
-                            autofocus: true,
-                            style: AppTheme.getTextStyle(
+                        title: Row(
+                          children: [
+                            Icon(
+                              (!checkedIn!) ? Icons.login : Icons.logout,
+                              color: (!checkedIn!) ? Colors.green : Colors.red,
+                            ),
+                            SizedBox(width: MySize.size8!),
+                            Expanded(
+                              child: Text(
+                                (!checkedIn!)
+                                    ? AppLocalizations.of(context)
+                                        .translate('check_in_note')
+                                    : AppLocalizations.of(context)
+                                        .translate('check_out_note'),
+                                style: AppTheme.getTextStyle(
+                                  themeData.textTheme.titleMedium,
+                                  fontWeight: 600,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              (!checkedIn!)
+                                  ? 'Please add a note for your check-in'
+                                  : 'Please add a note for your check-out',
+                              style: AppTheme.getTextStyle(
+                                themeData.textTheme.bodyMedium,
+                                color: themeData.colorScheme.onSurface.withOpacity(0.7),
+                              ),
+                            ),
+                            SizedBox(height: MySize.size16!),
+                            TextFormField(
+                              controller: note,
+                              autofocus: true,
+                              decoration: InputDecoration(
+                                hintText: 'Enter your note here...',
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(MySize.size8!),
+                                ),
+                                filled: true,
+                                fillColor: themeData.colorScheme.surface,
+                              ),
+                              style: AppTheme.getTextStyle(
                                 themeData.textTheme.bodyLarge,
-                                color: themeData.colorScheme.onSurface,
-                                fontWeight: 600,
-                                muted: true)),
+                                fontWeight: 500,
+                              ),
+                            ),
+                          ],
+                        ),
                         actions: <Widget>[
                           TextButton(
-                                                          style: TextButton.styleFrom(
-                              foregroundColor: themeData.colorScheme.primary,
+                            style: TextButton.styleFrom(
+                              foregroundColor: themeData.colorScheme.onSurface.withOpacity(0.6),
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                              note.clear();
+                            },
+                            child: Text(
+                              AppLocalizations.of(context).translate('cancel'),
+                            ),
+                          ),
+                          ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: (!checkedIn!) ? Colors.green : Colors.red,
+                              foregroundColor: Colors.white,
                             ),
                             onPressed: () async {
+                              if (note.text.trim().isEmpty) {
+                                Fluttertoast.showToast(
+                                  msg: 'Please enter a note before proceeding',
+                                );
+                                return;
+                              }
+                              
                               Navigator.pop(context);
+                              setState(() {
+                                syncPressed = true;
+                              });
+                              
                               if (await Helper().checkConnectivity()) {
                                 try {
                                   await Geolocator.getCurrentPosition(
-                                          desiredAccuracy:
-                                              LocationAccuracy.high)
-                                      .then((Position position) {
-                                    currentLoc = LatLng(position.latitude,
-                                        position.longitude);
+                                    desiredAccuracy: LocationAccuracy.high,
+                                  ).then((Position position) {
+                                    currentLoc = LatLng(position.latitude, position.longitude);
                                   });
-                                } catch (e) {}
+                                } catch (e) {
+                                  print('Location error: $e');
+                                }
+                                
                                 if (checkedIn == false) {
                                   //get ip address
-                                  var ipAddress =
-                                      IpAddress(type: RequestType.json);
-
-                                  /// Get the IpAddress based on requestType.
+                                  var ipAddress = IpAddress(type: RequestType.json);
                                   dynamic data = await ipAddress.getIpAddress();
                                   String iP = data.toString();
 
                                   //get current location
                                   try {
                                     await Geolocator.getCurrentPosition(
-                                            desiredAccuracy:
-                                                LocationAccuracy.high)
-                                        .then((Position position) {
-                                      currentLoc = LatLng(position.latitude,
-                                          position.longitude);
+                                      desiredAccuracy: LocationAccuracy.high,
+                                    ).then((Position position) {
+                                      currentLoc = LatLng(position.latitude, position.longitude);
                                     });
-                                  } catch (e) {}
+                                  } catch (e) {
+                                    print('Location error: $e');
+                                  }
 
                                   var checkInMap = await Attendance().doCheckIn(
-                                      checkInNote: note.text,
-                                      iPAddress: iP,
-                                      latitude: (currentLoc != null)
-                                          ? currentLoc!.latitude
-                                          : '',
-                                      longitude: (currentLoc != null)
-                                          ? currentLoc!.longitude
-                                          : '');
+                                    checkInNote: note.text,
+                                    iPAddress: iP,
+                                    latitude: (currentLoc != null) ? currentLoc!.latitude : '',
+                                    longitude: (currentLoc != null) ? currentLoc!.longitude : '',
+                                  );
                                   Fluttertoast.showToast(msg: checkInMap);
                                   note.clear();
                                 } else {
                                   //get current location
                                   try {
                                     await Geolocator.getCurrentPosition(
-                                            desiredAccuracy:
-                                                LocationAccuracy.high)
-                                        .then((Position position) {
-                                      currentLoc = LatLng(position.latitude,
-                                          position.longitude);
+                                      desiredAccuracy: LocationAccuracy.high,
+                                    ).then((Position position) {
+                                      currentLoc = LatLng(position.latitude, position.longitude);
                                     });
-                                  } catch (e) {}
+                                  } catch (e) {
+                                    print('Location error: $e');
+                                  }
 
-                                  var checkOutMap = await Attendance()
-                                      .doCheckOut(
-                                          latitude: (currentLoc != null)
-                                              ? currentLoc!.latitude
-                                              : '',
-                                          longitude: (currentLoc != null)
-                                              ? currentLoc!.longitude
-                                              : '',
-                                          checkOutNote: note.text);
+                                  var checkOutMap = await Attendance().doCheckOut(
+                                    latitude: (currentLoc != null) ? currentLoc!.latitude : '',
+                                    longitude: (currentLoc != null) ? currentLoc!.longitude : '',
+                                    checkOutNote: note.text,
+                                  );
                                   Fluttertoast.showToast(msg: checkOutMap);
                                   note.clear();
                                 }
-                                checkedIn = await Attendance()
-                                    .getAttendanceStatus(USERID);
-                                await Attendance()
-                                    .getCheckInTime(USERID)
-                                    .then((value) {
+                                
+                                checkedIn = await Attendance().getAttendanceStatus(USERID);
+                                await Attendance().getCheckInTime(USERID).then((value) {
                                   if (value != null) {
                                     clockInTime = DateTime.parse(value);
                                   }
                                 });
-                                setState(() {});
-                              } else
+                                setState(() {
+                                  syncPressed = false;
+                                });
+                              } else {
                                 Fluttertoast.showToast(
-                                    msg: AppLocalizations.of(context)
-                                        .translate('check_connectivity'));
+                                  msg: AppLocalizations.of(context).translate('check_connectivity'),
+                                );
+                                setState(() {
+                                  syncPressed = false;
+                                });
+                              }
                             },
                             child: Text(
-                                AppLocalizations.of(context).translate('ok')),
+                              AppLocalizations.of(context).translate('ok'),
+                            ),
                           ),
-                          TextButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            child: Text(AppLocalizations.of(context)
-                                .translate('cancel')),
-                          )
                         ],
                       );
-                    });
-              },
-              child: (!checkedIn!)
-                  ? Text(AppLocalizations.of(context).translate('check_in'),
+                    },
+                  );
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    if (syncPressed)
+                      Container(
+                        width: 20,
+                        height: 20,
+                        margin: EdgeInsets.only(right: MySize.size8!),
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        ),
+                      ),
+                    Icon(
+                      (!checkedIn!) ? Icons.login : Icons.logout,
+                      size: 20,
+                    ),
+                    SizedBox(width: MySize.size8!),
+                    Text(
+                      (!checkedIn!)
+                          ? AppLocalizations.of(context).translate('check_in')
+                          : AppLocalizations.of(context).translate('check_out'),
                       style: AppTheme.getTextStyle(
-                          themeData.textTheme.titleSmall,
-                          color: themeData.colorScheme.surface,
-                          fontWeight: 600))
-                  : Text(AppLocalizations.of(context).translate('check_out'),
-                      style: AppTheme.getTextStyle(
-                          themeData.textTheme.titleSmall,
-                          color: themeData.colorScheme.primary,
-                          fontWeight: 600)),
+                        themeData.textTheme.titleMedium,
+                        color: Colors.white,
+                        fontWeight: 600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-            Text(
-                (!checkedIn!)
-                    ? ''
-                    : DateTime.now().difference(clockInTime).toString(),
-                style: AppTheme.getTextStyle(
-                  themeData.textTheme.titleSmall,
-                  color: themeData.colorScheme.onSurface,
-                )),
+            if (checkedIn == true)
+              Container(
+                margin: EdgeInsets.only(top: MySize.size8!),
+                padding: EdgeInsets.symmetric(
+                  horizontal: MySize.size16!,
+                  vertical: MySize.size8!,
+                ),
+                decoration: BoxDecoration(
+                  color: Colors.green.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(MySize.size8!),
+                  border: Border.all(
+                    color: Colors.green.withOpacity(0.3),
+                    width: 1,
+                  ),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.access_time,
+                      size: 16,
+                      color: Colors.green,
+                    ),
+                    SizedBox(width: MySize.size8!),
+                    Text(
+                      'Checked in: ${_formatDuration(DateTime.now().difference(clockInTime))}',
+                      style: AppTheme.getTextStyle(
+                        themeData.textTheme.bodyMedium,
+                        color: Colors.green,
+                        fontWeight: 500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
           ],
         ),
       );
     } else
       return Container();
+  }
+
+  // Helper method to format duration
+  String _formatDuration(Duration duration) {
+    String twoDigits(int n) => n.toString().padLeft(2, '0');
+    String hours = twoDigits(duration.inHours);
+    String minutes = twoDigits(duration.inMinutes.remainder(60));
+    return '$hours:$minutes';
   }
 
 //load statistics
