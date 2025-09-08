@@ -1452,6 +1452,7 @@ class _SalesState extends State<Sales> {
       selectedItem: selectedCustomer,
       items: (String filter, LoadProps? loadProps) => customerListMap,
       itemAsString: (Map<dynamic, dynamic> value) => "${value['name']} (${value['mobile'] ?? ' - '})",
+      compareFn: (Map<dynamic, dynamic> item1, Map<dynamic, dynamic> item2) => item1['id'] == item2['id'],
       onChanged: (Map<dynamic, dynamic>? newValue) async {
         if (newValue != null) {
           setState(() {
