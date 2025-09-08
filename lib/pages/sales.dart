@@ -566,143 +566,171 @@ class _SalesState extends State<Sales> {
                       (showFilter)
                           ? Column(
                               children: [
+                                SizedBox(height: MySize.size16!),
                                 Row(
                                   children: [
-                                    Text(
-                                      "${AppLocalizations.of(context).translate('location')} : ",
-                                      style: AppTheme.getTextStyle(
-                                          themeData.textTheme.bodyLarge,
-                                          fontWeight: 600),
+                                    SizedBox(
+                                      width: MySize.screenWidth! * 0.25,
+                                      child: Text(
+                                        "${AppLocalizations.of(context).translate('location')} :",
+                                        style: AppTheme.getTextStyle(
+                                            themeData.textTheme.bodyLarge,
+                                            fontWeight: 600),
+                                      ),
                                     ),
-                                    locations()
+                                    Expanded(child: locations())
                                   ],
                                 ),
+                                SizedBox(height: MySize.size12!),
                                 Row(
                                   children: [
-                                    Text(
-                                      "${AppLocalizations.of(context).translate('customer')} : ",
-                                      style: AppTheme.getTextStyle(
-                                          themeData.textTheme.bodyLarge,
-                                          fontWeight: 600),
+                                    SizedBox(
+                                      width: MySize.screenWidth! * 0.25,
+                                      child: Text(
+                                        "${AppLocalizations.of(context).translate('customer')} :",
+                                        style: AppTheme.getTextStyle(
+                                            themeData.textTheme.bodyLarge,
+                                            fontWeight: 600),
+                                      ),
                                     ),
                                     Expanded(child: customers())
                                   ],
                                 ),
-                                GestureDetector(
-                                  onTap: () {
-                                    Navigator.of(context)
-                                        .push(new MaterialPageRoute<Null>(
-                                            builder: (BuildContext context) {
-                                              return dateRangePicker();
-                                            },
-                                            fullscreenDialog: true));
-                                  },
-                                  child: Container(
-                                    padding: EdgeInsets.all(MySize.size8!),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.all(
-                                          Radius.circular(MySize.size8!)),
-                                      color: customAppTheme.bgLayer1,
-                                      border: Border.all(
-                                          color: customAppTheme.bgLayer4,
-                                          width: 2),
-                                    ),
-                                    child: Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Text(
-                                            (startDateRange != null &&
-                                                    endDateRange != null)
-                                                ? "$startDateRange   -   $endDateRange"
-                                                : "Date range",
-                                            style: AppTheme.getTextStyle(
-                                                themeData.textTheme.bodyLarge,
-                                                fontWeight: 600)),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: MySize.size6!),
-                                ),
+                                SizedBox(height: MySize.size12!),
                                 Row(
                                   children: [
-                                    Text(
-                                      "${AppLocalizations.of(context).translate('payment_status')} : ",
-                                      style: AppTheme.getTextStyle(
-                                          themeData.textTheme.bodyLarge,
-                                          fontWeight: 600),
+                                    SizedBox(
+                                      width: MySize.screenWidth! * 0.25,
+                                      child: Text(
+                                        "Date Range :",
+                                        style: AppTheme.getTextStyle(
+                                            themeData.textTheme.bodyLarge,
+                                            fontWeight: 600),
+                                      ),
                                     ),
-                                    (paymentStatuses.length > 0)
-                                        ? paymentStatus()
-                                        : Container()
+                                    Expanded(
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          Navigator.of(context)
+                                              .push(new MaterialPageRoute<Null>(
+                                                  builder: (BuildContext context) {
+                                                    return dateRangePicker();
+                                                  },
+                                                  fullscreenDialog: true));
+                                        },
+                                        child: Container(
+                                          padding: EdgeInsets.symmetric(horizontal: MySize.size12!, vertical: MySize.size8!),
+                                          decoration: BoxDecoration(
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(MySize.size8!)),
+                                            color: customAppTheme.bgLayer1,
+                                            border: Border.all(
+                                                color: customAppTheme.bgLayer4,
+                                                width: 1.2),
+                                          ),
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.spaceBetween,
+                                            children: [
+                                              Text(
+                                                  (startDateRange != null &&
+                                                          endDateRange != null)
+                                                      ? "$startDateRange - $endDateRange"
+                                                      : "Select Date Range",
+                                                  style: AppTheme.getTextStyle(
+                                                      themeData.textTheme.bodyMedium,
+                                                      fontWeight: 500)),
+                                              Icon(
+                                                Icons.calendar_today,
+                                                size: MySize.size16!,
+                                                color: themeData.colorScheme.primary,
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                    ),
                                   ],
                                 ),
-                                Padding(
-                                  padding: EdgeInsets.symmetric(
-                                      vertical: MySize.size6!),
+                                SizedBox(height: MySize.size12!),
+                                Row(
+                                  children: [
+                                    SizedBox(
+                                      width: MySize.screenWidth! * 0.25,
+                                      child: Text(
+                                        "${AppLocalizations.of(context).translate('payment_status')} :",
+                                        style: AppTheme.getTextStyle(
+                                            themeData.textTheme.bodyLarge,
+                                            fontWeight: 600),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: (paymentStatuses.length > 0)
+                                          ? paymentStatus()
+                                          : Container()
+                                    ),
+                                  ],
                                 ),
+                                SizedBox(height: MySize.size20!),
                                 Row(
                                   mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceEvenly,
                                   children: [
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                MySize.size20!),
-                                            side: BorderSide(
-                                                color: themeData
-                                                    .colorScheme.primary)),
-                                        foregroundColor:
-                                            themeData.colorScheme.primary,
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(
+                                                  MySize.size12!)),
+                                          backgroundColor: Colors.grey[100],
+                                          foregroundColor: themeData.colorScheme.primary,
+                                          elevation: 0,
+                                          padding: EdgeInsets.symmetric(vertical: MySize.size12!),
+                                        ),
+                                        child: Text(
+                                          AppLocalizations.of(context)
+                                              .translate('reset'),
+                                          style: AppTheme.getTextStyle(
+                                              themeData.textTheme.labelLarge,
+                                              fontWeight: 600),
+                                        ),
+                                        onPressed: () {
+                                          setState(() {
+                                            selectedLocation = locationListMap[0];
+                                            selectedCustomer = customerListMap[0];
+                                            startDateRange = null;
+                                            endDateRange = null;
+                                            selectedPaymentStatus =
+                                                paymentStatuses[0];
+                                          });
+                                          onFilter();
+                                        },
                                       ),
-                                      child: Text(
-                                        AppLocalizations.of(context)
-                                            .translate('reset'),
-                                        style: AppTheme.getTextStyle(
-                                            themeData.textTheme.labelLarge,
-                                            color:
-                                                themeData.colorScheme.onPrimary,
-                                            fontWeight: 600),
-                                      ),
-                                      onPressed: () {
-                                        setState(() {
-                                          selectedLocation = locationListMap[0];
-                                          selectedCustomer = customerListMap[0];
-                                          startDateRange = null;
-                                          endDateRange = null;
-                                          selectedPaymentStatus =
-                                              paymentStatuses[0];
-                                        });
-                                        onFilter();
-                                      },
                                     ),
-                                    ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        shape: RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.circular(
-                                                MySize.size20!),
-                                            side: BorderSide(
-                                                color: themeData
-                                                    .colorScheme.primary)),
-                                        foregroundColor:
-                                            themeData.colorScheme.primary,
+                                    SizedBox(width: MySize.size12!),
+                                    Expanded(
+                                      child: ElevatedButton(
+                                        style: ElevatedButton.styleFrom(
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius: BorderRadius.circular(
+                                                  MySize.size12!)),
+                                          backgroundColor: themeData.colorScheme.primary,
+                                          foregroundColor: themeData.colorScheme.onPrimary,
+                                          elevation: 0,
+                                          padding: EdgeInsets.symmetric(vertical: MySize.size12!),
+                                        ),
+                                        child: Text(
+                                          AppLocalizations.of(context)
+                                              .translate('ok'),
+                                          style: AppTheme.getTextStyle(
+                                              themeData.textTheme.labelLarge,
+                                              color: Colors.white,
+                                              fontWeight: 600),
+                                        ),
+                                        onPressed: () {
+                                          onFilter();
+                                        },
                                       ),
-                                      child: Text(
-                                        AppLocalizations.of(context)
-                                            .translate('ok'),
-                                        style: AppTheme.getTextStyle(
-                                            themeData.textTheme.labelLarge,
-                                            color:
-                                                themeData.colorScheme.onPrimary,
-                                            fontWeight: 600),
-                                      ),
-                                      onPressed: () {
-                                        onFilter();
-                                      },
                                     ),
                                   ],
                                 )
@@ -1451,7 +1479,7 @@ class _SalesState extends State<Sales> {
     return DropdownSearch<Map<dynamic, dynamic>>(
       selectedItem: selectedCustomer,
       items: (String filter, LoadProps? loadProps) => customerListMap,
-      itemAsString: (Map<dynamic, dynamic> value) => "${value['name']} (${value['mobile'] ?? ' - '})",
+      itemAsString: (Map<dynamic, dynamic> value) => value['id'] == 0 ? value['name'] : "${value['name']} (${value['mobile'] ?? ' - '})",
       compareFn: (Map<dynamic, dynamic> item1, Map<dynamic, dynamic> item2) => item1['id'] == item2['id'],
       onChanged: (Map<dynamic, dynamic>? newValue) async {
         if (newValue != null) {
@@ -1478,7 +1506,7 @@ class _SalesState extends State<Sales> {
             width: MySize.screenWidth! * 0.8,
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             child: Text(
-              "${item['name']} (${item['mobile'] ?? ' - '})",
+              item['id'] == 0 ? item['name'] : "${item['name']} (${item['mobile'] ?? ' - '})",
               softWrap: true,
               overflow: TextOverflow.ellipsis,
               style: AppTheme.getTextStyle(themeData.textTheme.bodyMedium,
